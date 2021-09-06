@@ -1,17 +1,16 @@
-package ua.leonidius.coldline;
+package ua.leonidius.coldline
 
-import android.os.Bundle;
+import com.badlogic.gdx.backends.android.AndroidApplication
+import android.os.Bundle
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 
-import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import ua.leonidius.coldline.Main;
-
-/** Launches the Android application. */
-public class AndroidLauncher extends AndroidApplication {
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
-		initialize(new Main(), configuration);
-	}
+/** Launches the Android application.  */
+class AndroidLauncher : AndroidApplication() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val config = AndroidApplicationConfiguration()
+        config.useAccelerometer = false;
+        config.useCompass = false;
+        initialize(Main(), config)
+    }
 }

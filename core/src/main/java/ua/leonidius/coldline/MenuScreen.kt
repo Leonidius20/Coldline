@@ -1,15 +1,39 @@
 package ua.leonidius.coldline
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.utils.ScreenUtils
 
 /** First screen of the application. Displayed after the application is created.  */
-class FirstScreen : Screen {
+class MenuScreen(private val game: Main) : Screen {
+
+    private val camera = OrthographicCamera().apply {
+        setToOrtho(false, 800F, 480F)
+    }
+
     override fun show() {
         // Prepare your screen here.
     }
 
     override fun render(delta: Float) {
-        // Draw your screen here. "delta" is the time since last render in seconds.
+        ScreenUtils.clear(0F, 0F, 0.2F, 1F)
+
+        camera.update()
+
+        with(game) {
+            batch.projectionMatrix = camera.combined
+            batch.begin()
+
+            bitmapFont.draw(batch, "Welcome", 100F, 150F)
+            bitmapFont.draw(batch, "Tap anywhere to begin", 100F, 100F)
+
+            batch.end()
+        }
+
+        if (Gdx.input.isTouched)
+            game.toGameScreen()
+            dispose()
     }
 
     override fun resize(width: Int, height: Int) {

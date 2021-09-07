@@ -3,6 +3,7 @@ package ua.leonidius.coldline
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Rectangle
@@ -11,7 +12,7 @@ import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 
-class GameScreen(val game: Main) : Screen {
+class GameScreen(private val game: Main) : Screen {
 
     private val dropImage = Texture(Gdx.files.internal("droplet.png"))
     private val bucketImage = Texture(Gdx.files.internal("bucket.png"))
@@ -19,7 +20,7 @@ class GameScreen(val game: Main) : Screen {
     private val rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.wav"))
         .apply { isLooping = true }
 
-
+    private val camera = OrthographicCamera()
 
     private val bucket = Rectangle().apply {
         width = 64F
@@ -34,6 +35,7 @@ class GameScreen(val game: Main) : Screen {
     private var lastDropTime = 0L
 
     init {
+        camera.setToOrtho(false, 800F, 480F)
         spawnRaindrop()
     }
 
@@ -69,7 +71,7 @@ class GameScreen(val game: Main) : Screen {
 
         if (Gdx.input.isTouched) {
             touchPos.set(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0F)
-            game.camera.unproject(touchPos)
+            camera.unproject(touchPos)
             bucket.x = touchPos.x - 64 / 2
         }
 

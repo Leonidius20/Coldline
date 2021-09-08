@@ -1,9 +1,10 @@
-package ua.leonidius.coldline
+package ua.leonidius.coldline.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.ScreenUtils
+import ua.leonidius.coldline.Main
 
 /** First screen of the application. Displayed after the application is created.  */
 class MenuScreen(private val game: Main) : Screen {

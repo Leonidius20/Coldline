@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="CosmicLilacTiles.tsx"/>
+ <tileset firstgid="105" source="CosmicLilacTiles.tsx"/>
+ <layer id="1" name="Bottom layer" width="10" height="10">
+  <data encoding="csv">
+79,101,101,101,101,101,101,79,101,101,
+101,101,101,101,101,101,3,3,4,101,
+101,1,2,2,2,2,95,95,17,101,
+101,27,95,95,95,95,95,95,17,101,
+101,27,95,95,95,95,95,95,17,101,
+101,27,95,95,95,95,95,95,17,101,
+101,27,95,95,95,95,95,95,17,101,
+101,40,42,42,42,42,42,42,43,101,
+101,101,79,101,101,101,79,101,101,101,
+101,101,101,101,101,101,79,101,101,101
+</data>
+ </layer>
+ <layer id="2" name="Top layer" width="10" height="10">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,26,0,0,0,0,0,0,0,
+0,0,39,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,24,0,0,
+0,0,0,0,0,0,0,37,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>

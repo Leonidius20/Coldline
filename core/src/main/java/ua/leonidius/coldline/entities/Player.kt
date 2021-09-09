@@ -1,15 +1,18 @@
 package ua.leonidius.coldline.entities
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Vector2
 
-class Player(sprite: Sprite, private val collisionLayer: TiledMapTileLayer): Sprite(sprite) {
+class Player(sprite: Sprite,
+             private val collisionLayer: TiledMapTileLayer): Sprite(sprite), InputProcessor {
 
     private val velocity = Vector2()
-    private val speed = 60 * 2
+    private val speed = 60 * 2F
 
     override fun draw(batch: Batch?) {
         update(Gdx.graphics.deltaTime)
@@ -49,8 +52,8 @@ class Player(sprite: Sprite, private val collisionLayer: TiledMapTileLayer): Spr
 
     private fun isTileWithCollisionAt(mapX: Float, mapY: Float) =
         collisionLayer.run {
-            getCell((mapX / tileWidth).toInt(), (mapY / tileHeight).toInt())
-                .tile.properties.containsKey("blocked")
+            val cell = getCell((mapX / tileWidth).toInt(), (mapY / tileHeight).toInt())
+            cell?.tile!!.properties.containsKey("blocked") ?: true
         }
 
     /**
@@ -62,5 +65,37 @@ class Player(sprite: Sprite, private val collisionLayer: TiledMapTileLayer): Spr
         setPosition((x * collisionLayer.tileWidth).toFloat(),
             (y * collisionLayer.tileHeight).toFloat())
     }
+
+    override fun keyDown(keycode: Int): Boolean {
+        when(keycode) {
+            Input.Keys.W -> velocity.y = speed
+            Input.Keys.A -> velocity.x = -speed
+            Input.Keys.S -> velocity.y = -speed
+            Input.Keys.D -> velocity.x = speed
+        }
+        return true
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        when(keycode) {
+            Input.Keys.W -> velocity.y = 0F
+            Input.Keys.A -> velocity.x = 0F
+            Input.Keys.S -> velocity.y = 0F
+            Input.Keys.D -> velocity.x = 0F
+        }
+        return true
+    }
+
+    override fun keyTyped(character: Char) = false
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int) = false
+
+    override fun mouseMoved(screenX: Int, screenY: Int) = false
+
+    override fun scrolled(amountX: Float, amountY: Float) = false
 
 }

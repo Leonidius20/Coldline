@@ -1,5 +1,6 @@
 package ua.leonidius.coldline.screens
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
@@ -25,6 +26,7 @@ class GameScreen(private val game: Main) : Screen {
 
     override fun show() {
         player.moveToTile(5, 5)
+        Gdx.input.inputProcessor = player
     }
 
     override fun render(delta: Float) {

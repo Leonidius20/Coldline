@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Vector2
 
-class Player(sprite: Sprite, val collisionLayer: TiledMapTileLayer): Sprite(sprite) {
+class Player(sprite: Sprite, private val collisionLayer: TiledMapTileLayer): Sprite(sprite) {
 
     private val velocity = Vector2()
     private val speed = 60 * 2
@@ -17,33 +17,34 @@ class Player(sprite: Sprite, val collisionLayer: TiledMapTileLayer): Sprite(spri
     }
 
     private fun update(delta: Float) {
-        //x += velocity.x * delta
-        //y += velocity.y * delta
+        val newX = x + velocity.x * delta
+        val newY = y + velocity.y * delta
 
-        val newX = velocity.x * delta
-        val newY = velocity.y * delta
+        val collidesOnX =
+            if (velocity.x < 0)
+                isTileWithCollisionAt(newX, y + height) // using old Y here so avoid going through corners diagonally
+                        || isTileWithCollisionAt(newX, y / 2)
+                        || isTileWithCollisionAt(newX, y)
+            else if (velocity.x > 0)
+                isTileWithCollisionAt(newX + width, y + height)
+                        || isTileWithCollisionAt(newX + width, y / 2)
+                        || isTileWithCollisionAt(newX + width, y)
+            else false
 
+        if (!collidesOnX) x = newX else velocity.x = 0F
 
-        if (velocity.x < 0) { // left
+        val collidesOnY =
+            if (velocity.y < 0)  // down (or up)
+                isTileWithCollisionAt(x, newY)
+                        || isTileWithCollisionAt(x + width / 2, newY)
+                        || isTileWithCollisionAt(x + width, newY)
+            else if (velocity.y > 0)
+                isTileWithCollisionAt(x, newY + height)
+                        || isTileWithCollisionAt(x + width / 2, newY + height)
+                        || isTileWithCollisionAt(x + width, newY + height)
+            else false
 
-            if (isTileWithCollisionAt(newX, y + height) // using old Y here so avoid going through corners diagonally
-                || isTileWithCollisionAt(newX, y / 2)
-                || isTileWithCollisionAt(newX, y)) {
-                // move i guess
-            }
-        } else if (velocity.x > 0) { // right
-            if (isTileWithCollisionAt(newX + width, y + height)
-                || isTileWithCollisionAt(newX + width, y / 2)
-                || isTileWithCollisionAt(newX + width, y)) {
-                // move
-            }
-        }
-
-        if (velocity.y < 0) { // down (or up)
-
-        } else if (velocity.y > 0) { // up
-
-        }
+        if (!collidesOnY) y = newY else velocity.y = 0F
     }
 
     private fun isTileWithCollisionAt(mapX: Float, mapY: Float) =
@@ -51,5 +52,15 @@ class Player(sprite: Sprite, val collisionLayer: TiledMapTileLayer): Sprite(spri
             getCell((mapX / tileWidth).toInt(), (mapY / tileHeight).toInt())
                 .tile.properties.containsKey("blocked")
         }
+
+    /**
+     * Set player's position in the world using tile coordinates
+     * @param x tile's x coordinate
+     * @param y tile's y coordinate
+     */
+    fun moveToTile(x: Int, y: Int) {
+        setPosition((x * collisionLayer.tileWidth).toFloat(),
+            (y * collisionLayer.tileHeight).toFloat())
+    }
 
 }

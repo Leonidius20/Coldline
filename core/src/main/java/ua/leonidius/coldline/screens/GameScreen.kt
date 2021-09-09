@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.utils.ScreenUtils
@@ -16,13 +17,14 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val tiledMap = TmxMapLoader().load("maps/level1.tmx")
-    private val renderer = OrthogonalTiledMapRenderer(tiledMap, 3F)
+    private val map = TmxMapLoader().load("maps/level1.tmx")
+    private val renderer = OrthogonalTiledMapRenderer(map, 3F)
 
-    private val player = Player(Sprite(Texture("bucket.png")))
+    private val player = Player(Sprite(Texture("bucket.png")),
+        map.layers[0] as TiledMapTileLayer)
 
     override fun show() {
-
+        player.moveToTile(5, 5)
     }
 
     override fun render(delta: Float) {
@@ -61,7 +63,7 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     override fun dispose() {
-        tiledMap.dispose()
+        map.dispose()
         renderer.dispose()
         player.texture.dispose()
     }

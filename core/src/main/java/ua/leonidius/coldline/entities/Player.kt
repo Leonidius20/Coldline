@@ -12,7 +12,7 @@ class Player(sprite: Sprite,
              private val collisionLayer: TiledMapTileLayer): Sprite(sprite), InputProcessor {
 
     private val velocity = Vector2()
-    private val speed = 60 * 2F
+    private val speed = 60 * 3F
 
     override fun draw(batch: Batch?) {
         update(Gdx.graphics.deltaTime)
@@ -25,13 +25,13 @@ class Player(sprite: Sprite,
 
         val collidesOnX =
             if (velocity.x < 0)
-                isTileWithCollisionAt(newX, y + height) // using old Y here so avoid going through corners diagonally
+                /*isTileWithCollisionAt(newX, y + height) // using old Y here so avoid going through corners diagonally
                         || isTileWithCollisionAt(newX, y / 2)
-                        || isTileWithCollisionAt(newX, y)
+                        ||*/ isTileWithCollisionAt(newX, y)
             else if (velocity.x > 0)
-                isTileWithCollisionAt(newX + width, y + height)
+                /*isTileWithCollisionAt(newX + width, y + height)
                         || isTileWithCollisionAt(newX + width, y / 2)
-                        || isTileWithCollisionAt(newX + width, y)
+                        ||*/ isTileWithCollisionAt(newX + width, y)
             else false
 
         if (!collidesOnX) x = newX else velocity.x = 0F
@@ -39,12 +39,12 @@ class Player(sprite: Sprite,
         val collidesOnY =
             if (velocity.y < 0)  // down (or up)
                 isTileWithCollisionAt(x, newY)
-                        || isTileWithCollisionAt(x + width / 2, newY)
-                        || isTileWithCollisionAt(x + width, newY)
+                        /*|| isTileWithCollisionAt(x + width / 2, newY)
+                        || isTileWithCollisionAt(x + width, newY)*/
             else if (velocity.y > 0)
                 isTileWithCollisionAt(x, newY + height)
-                        || isTileWithCollisionAt(x + width / 2, newY + height)
-                        || isTileWithCollisionAt(x + width, newY + height)
+                        /*|| isTileWithCollisionAt(x + width / 2, newY + height)
+                        || isTileWithCollisionAt(x + width, newY + height)*/
             else false
 
         if (!collidesOnY) y = newY else velocity.y = 0F
@@ -52,8 +52,9 @@ class Player(sprite: Sprite,
 
     private fun isTileWithCollisionAt(mapX: Float, mapY: Float) =
         collisionLayer.run {
-            val cell = getCell((mapX / tileWidth).toInt(), (mapY / tileHeight).toInt())
-            cell?.tile!!.properties.containsKey("blocked") ?: true
+            // 3 = scalefactor
+            val cell = getCell((mapX / (tileWidth * 3)).toInt(), (mapY / (tileHeight * 3)).toInt())
+            cell?.tile?.properties?.containsKey("blocked") ?: true
         }
 
     /**
@@ -62,8 +63,9 @@ class Player(sprite: Sprite,
      * @param y tile's y coordinate
      */
     fun moveToTile(x: Int, y: Int) {
-        setPosition((x * collisionLayer.tileWidth).toFloat(),
-            (y * collisionLayer.tileHeight).toFloat())
+        // 3 = scalefactor
+        setPosition((x * collisionLayer.tileWidth * 3).toFloat(),
+            (y * collisionLayer.tileHeight * 3).toFloat())
     }
 
     override fun keyDown(keycode: Int): Boolean {

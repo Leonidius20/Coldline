@@ -21,7 +21,7 @@ class GameScreen(private val game: Main) : Screen {
     private val map = TmxMapLoader().load("maps/level1.tmx")
     private val renderer = OrthogonalTiledMapRenderer(map, 3F)
 
-    private val player = Player(Sprite(Texture("bucket.png")),
+    private val player = Player(Sprite(Texture("player.png")).apply { setScale(3F) },
         map.layers[0] as TiledMapTileLayer)
 
     override fun show() {

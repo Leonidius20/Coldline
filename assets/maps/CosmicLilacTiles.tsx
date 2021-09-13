@@ -21,12 +21,32 @@
    <property name="blocked" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="8">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="9">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="13">
   <properties>
    <property name="blocked" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="16">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="17">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="18">
   <properties>
    <property name="blocked" type="bool" value="true"/>
   </properties>
@@ -77,6 +97,16 @@
   </properties>
  </tile>
  <tile id="42">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="43">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="44">
   <properties>
    <property name="blocked" type="bool" value="true"/>
   </properties>

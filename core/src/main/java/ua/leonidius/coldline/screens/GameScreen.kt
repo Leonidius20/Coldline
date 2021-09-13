@@ -18,14 +18,14 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val map = TmxMapLoader().load("maps/level1.tmx")
+    private val map = TmxMapLoader().load("maps/level2.tmx")
     private val renderer = OrthogonalTiledMapRenderer(map, 3F)
 
     private val player = Player(Sprite(Texture("player.png")).apply { setScale(3F) },
         map.layers[0] as TiledMapTileLayer)
 
     override fun show() {
-        player.moveToTile(5, 5)
+        player.moveToTile(45, 6)
         Gdx.input.inputProcessor = player
     }
 
@@ -41,6 +41,9 @@ class GameScreen(private val game: Main) : Screen {
                 end()
             }
         }
+
+        camera.position.set(player.x, player.y, 0F)
+        camera.update()
 
     }
 

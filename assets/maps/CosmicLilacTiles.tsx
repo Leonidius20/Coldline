@@ -111,4 +111,14 @@
    <property name="blocked" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="79">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="80">
+  <properties>
+   <property name="blocked" type="bool" value="true"/>
+  </properties>
+ </tile>
 </tileset>

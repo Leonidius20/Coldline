@@ -60,7 +60,7 @@ class Player(sprite: Sprite,
     private fun isTileWithCollisionAt(mapX: Float, mapY: Float) =
         collisionLayer.run {
             val cell = getCell((mapX / (tileWidth * scale)).toInt(), (mapY / (tileHeight * scale)).toInt())
-            cell?.tile?.properties?.containsKey("blocked") ?: true
+            cell?.tile?.properties?.containsKey("blocked") ?: false
         }
 
     /**

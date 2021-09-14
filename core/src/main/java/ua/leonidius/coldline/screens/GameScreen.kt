@@ -52,7 +52,7 @@ class GameScreen(private val game: Main) : Screen {
 
     private val player = Player(
         Sprite(Texture("player.png")).apply { setScale(scale) },
-        map.layers[0] as TiledMapTileLayer, this
+        map.layers.get("collision") as TiledMapTileLayer, this
     ).apply { moveToTile(45, 6) }
 
     private val objectLayer = map.layers["objects"]

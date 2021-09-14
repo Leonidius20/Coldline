@@ -17,7 +17,7 @@
 101,101,14,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,14,101,101,101,101,101,101,101,101,101,101,17,101,101,
 101,101,14,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,14,101,101,101,101,101,101,101,101,101,101,17,101,101,
 101,101,14,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,14,101,101,101,101,101,101,101,101,101,101,17,101,101,
-101,101,14,101,101,101,101,101,101,101,101,101,101,101,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,14,2,2,2,2,2,2,2,2,2,2,17,2,101,
+101,101,14,101,101,101,101,101,101,101,101,101,101,101,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,14,2,2,2,2,2,2,2,2,2,2,17,101,101,
 101,101,14,101,101,101,101,101,101,101,101,101,101,101,17,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,14,101,101,101,101,101,101,101,101,101,101,17,101,101,
 101,101,14,101,101,101,101,101,101,101,101,101,101,101,17,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,14,101,101,101,101,101,101,101,101,101,101,17,101,101,
 101,101,14,101,101,101,101,101,101,101,101,101,101,101,17,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,101,14,101,101,101,101,101,101,101,101,101,101,17,101,101,
@@ -60,97 +60,97 @@
    <property name="tag" value="exit"/>
   </properties>
   <object id="1" name="door" gid="32" x="720" y="80" width="16" height="16"/>
-  <object id="2" x="593.333" y="140.667">
+  <object id="2" x="592" y="144">
    <properties>
     <property name="graphNodeId" type="int" value="14"/>
    </properties>
    <point/>
   </object>
-  <object id="3" x="710.667" y="94">
+  <object id="3" x="720" y="80">
    <properties>
     <property name="graphNodeId" type="int" value="15"/>
    </properties>
    <point/>
   </object>
-  <object id="4" x="134" y="141.333">
+  <object id="4" x="128" y="144">
    <properties>
     <property name="graphNodeId" type="int" value="13"/>
    </properties>
    <point/>
   </object>
-  <object id="5" x="132" y="348">
+  <object id="5" x="128" y="352">
    <properties>
     <property name="graphNodeId" type="int" value="12"/>
    </properties>
    <point/>
   </object>
-  <object id="6" x="228.667" y="347.333">
+  <object id="6" x="224" y="352">
    <properties>
     <property name="graphNodeId" type="int" value="7"/>
    </properties>
    <point/>
   </object>
-  <object id="7" x="128.667" y="466.667">
+  <object id="7" x="128" y="464">
    <properties>
     <property name="graphNodeId" type="int" value="11"/>
    </properties>
    <point/>
   </object>
-  <object id="8" x="203.333" y="641.333">
+  <object id="8" x="208" y="640">
    <properties>
     <property name="graphNodeId" type="int" value="10"/>
    </properties>
    <point/>
   </object>
-  <object id="9" x="303.333" y="464">
+  <object id="9" x="304" y="464">
    <properties>
     <property name="graphNodeId" type="int" value="8"/>
    </properties>
    <point/>
   </object>
-  <object id="10" x="388" y="634.667">
+  <object id="10" x="384" y="640">
    <properties>
     <property name="graphNodeId" type="int" value="9"/>
    </properties>
    <point/>
   </object>
-  <object id="11" x="586.667" y="560.667">
+  <object id="11" x="592" y="560">
    <properties>
     <property name="graphNodeId" type="int" value="3"/>
    </properties>
    <point/>
   </object>
-  <object id="12" x="589.333" y="716.667">
+  <object id="12" x="592" y="720">
    <properties>
     <property name="graphNodeId" type="int" value="1"/>
    </properties>
    <point/>
   </object>
-  <object id="13" x="486" y="620.667">
+  <object id="13" x="480" y="640">
    <properties>
     <property name="graphNodeId" type="int" value="2"/>
    </properties>
    <point/>
   </object>
-  <object id="14" x="676" y="464">
+  <object id="14" x="672" y="464">
    <properties>
     <property name="graphNodeId" type="int" value="4"/>
    </properties>
    <point/>
   </object>
-  <object id="15" x="586" y="331.333">
+  <object id="15" x="592" y="336">
    <properties>
     <property name="graphNodeId" type="int" value="5"/>
    </properties>
    <point/>
   </object>
-  <object id="16" x="400.667" y="345.333">
+  <object id="16" x="400" y="336">
    <properties>
     <property name="graphNodeId" type="int" value="6"/>
    </properties>
    <point/>
   </object>
-  <object id="17" x="673.333" y="712">
+  <object id="17" x="672" y="720">
    <properties>
     <property name="graphNodeId" type="int" value="0"/>
    </properties>
@@ -162,7 +162,7 @@
     <property name="startNode" type="int" value="0"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -83.6667,3.33333"/>
+   <polyline points="-1,7 -81,7"/>
   </object>
   <object id="20" x="585.333" y="717">
    <properties>
@@ -170,7 +170,7 @@
     <property name="startNode" type="int" value="1"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -98.3333,-95.3333"/>
+   <polyline points="6.66667,3 -105.333,-77"/>
   </object>
   <object id="21" x="490.333" y="616.333">
    <properties>
@@ -178,7 +178,7 @@
     <property name="startNode" type="int" value="2"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 96.6667,-51.6667"/>
+   <polyline points="-10.3333,23.6667 101.667,-56.3333"/>
   </object>
   <object id="22" x="595.5" y="561">
    <properties>
@@ -186,7 +186,7 @@
     <property name="startNode" type="int" value="3"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 80.5,-93"/>
+   <polyline points="-3.5,-1 76.5,-97"/>
   </object>
   <object id="23" x="682" y="465.5">
    <properties>
@@ -194,7 +194,7 @@
     <property name="startNode" type="int" value="4"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -95,-133.5"/>
+   <polyline points="-10,-1.5 -90,-129.5"/>
   </object>
   <object id="24" x="581.5" y="332">
    <properties>
@@ -202,7 +202,7 @@
     <property name="startNode" type="int" value="5"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -179,13.5"/>
+   <polyline points="10.5,4 -181.5,4"/>
   </object>
   <object id="25" x="399" y="352">
    <properties>
@@ -210,7 +210,7 @@
     <property name="startNode" type="int" value="6"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -91,109"/>
+   <polyline points="1,-16 -95,112"/>
   </object>
   <object id="26" x="299.5" y="463">
    <properties>
@@ -218,7 +218,7 @@
     <property name="startNode" type="int" value="8"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -75,-115.5"/>
+   <polyline points="4.5,1 -75.5,-111"/>
   </object>
   <object id="27" x="219" y="347">
    <properties>
@@ -226,7 +226,7 @@
     <property name="startNode" type="int" value="7"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -80.5,-0.5"/>
+   <polyline points="5,5 -91,5"/>
   </object>
   <object id="28" x="136.5" y="352.5">
    <properties>
@@ -234,7 +234,7 @@
     <property name="startNode" type="int" value="11"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -8,114.5"/>
+   <polyline points="-8.5,-0.5 -8.5,111.5"/>
   </object>
   <object id="29" x="127.5" y="474">
    <properties>
@@ -242,7 +242,7 @@
     <property name="startNode" type="int" value="10"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 74,163.5"/>
+   <polyline points="0.5,-10 80.5,166"/>
   </object>
   <object id="30" x="207" y="637">
    <properties>
@@ -250,7 +250,7 @@
     <property name="startNode" type="int" value="9"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 181,-2.5"/>
+   <polyline points="1,3 177,3"/>
   </object>
   <object id="31" x="389" y="641.5">
    <properties>
@@ -258,7 +258,7 @@
     <property name="startNode" type="int" value="2"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 95,-19.5"/>
+   <polyline points="-5,-1.5 91,-1.5"/>
   </object>
   <object id="32" x="136.667" y="342.667">
    <properties>
@@ -266,7 +266,7 @@
     <property name="startNode" type="int" value="12"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -3.33333,-202"/>
+   <polyline points="-8.66667,9.33333 -8.66667,-198.667"/>
   </object>
   <object id="33" x="142" y="138">
    <properties>
@@ -274,7 +274,7 @@
     <property name="startNode" type="int" value="13"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 445.333,1.33333"/>
+   <polyline points="-14,6 450,6"/>
   </object>
   <object id="34" x="589" y="147">
    <properties>
@@ -282,7 +282,7 @@
     <property name="startNode" type="int" value="14"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 124.5,-50.5"/>
+   <polyline points="3,-3 131,-67"/>
   </object>
   <object id="35" x="300.667" y="470">
    <properties>
@@ -290,7 +290,7 @@
     <property name="startNode" type="int" value="8"/>
     <property name="tag" value="graphConnection"/>
    </properties>
-   <polyline points="0,0 -88.6667,158"/>
+   <polyline points="3.33333,-6 -92.6667,170"/>
   </object>
  </objectgroup>
 </map>

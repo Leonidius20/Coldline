@@ -3,6 +3,7 @@ package ua.leonidius.coldline.screens
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ai.pfa.GraphPath
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -18,11 +19,11 @@ import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 
 class GameScreen(private val game: Main) : Screen {
 
-    enum class PathAlgorithmTypes(val id: Int) {
-        NONE(0),
-        DFS(1),
-        BFS(2),
-        UCS(3);
+    enum class PathAlgorithmTypes(val id: Int, val color: Color) {
+        NONE(0, Color.CLEAR),
+        DFS(1, Color.RED),
+        BFS(2, Color.YELLOW),
+        UCS(3, Color.GREEN)
     }
 
     private val camera = OrthographicCamera().apply {
@@ -102,7 +103,7 @@ class GameScreen(private val game: Main) : Screen {
             path.forEachIndexed { index, graphNodeObject ->
                 if (index != 0) {
                     val startNode = path[index - 1]
-                    graph.getConnectionBetween(startNode, graphNodeObject)!!.render(shapeRenderer)
+                    graph.getConnectionBetween(startNode, graphNodeObject)!!.render(shapeRenderer, currentPathAlgorithm.color)
                 } else {
                     with(graphNodeObject.rectMapObj.rectangle) { startX = x; startY = y }
                 }

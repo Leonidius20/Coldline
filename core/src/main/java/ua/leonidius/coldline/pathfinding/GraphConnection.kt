@@ -17,9 +17,8 @@ class GraphConnection(graph: Graph, val polylineObj: PolylineMapObject):
 
     override fun getToNode() = endNode
 
-    fun render(shapeRenderer: ShapeRenderer) {
-        shapeRenderer.color = Color.RED
-
+    fun render(shapeRenderer: ShapeRenderer, color: Color) {
+        shapeRenderer.color = color
         shapeRenderer.polyline(polylineObj.polyline.transformedVertices)
     }
 

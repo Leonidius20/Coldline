@@ -2,7 +2,6 @@ package ua.leonidius.coldline.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath
 import com.badlogic.gdx.ai.pfa.GraphPath
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -11,10 +10,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
+import ua.leonidius.coldline.entities.Enemy
 import ua.leonidius.coldline.entities.Player
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
@@ -50,10 +49,10 @@ class GameScreen(private val game: Main) : Screen {
 
     private val shapeRenderer = ShapeRenderer()
 
-    private val player = Player(
-        Sprite(Texture("player.png")).apply { setScale(scale) },
-        map.layers.get("collision") as TiledMapTileLayer, this
-    ).apply { moveToTile(45, 6) }
+    private val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
+
+    val player = Player(collisionLayer, this)
+        .apply { moveToTile(45, 6) }
 
     private val objectLayer = map.layers["objects"]
     private val graph = Graph(objectLayer)
@@ -70,6 +69,15 @@ class GameScreen(private val game: Main) : Screen {
 
     private var debugInfoToRender = ""
 
+    private val enemies = arrayOf(
+        Enemy(collisionLayer, this).apply { moveToTile(30, 12) },
+        Enemy(collisionLayer, this).apply { moveToTile(30, 24) },
+        Enemy(collisionLayer, this).apply { moveToTile(40, 30) },
+        Enemy(collisionLayer, this).apply { moveToTile(38, 19) },
+        Enemy(collisionLayer, this).apply { moveToTile(16, 45) },
+        Enemy(collisionLayer, this).apply { moveToTile(27, 45) },
+    )
+
     override fun show() {
         Gdx.input.inputProcessor = player
     }
@@ -85,6 +93,7 @@ class GameScreen(private val game: Main) : Screen {
                 projectionMatrix = camera.combined
                 begin()
                 player.draw(this)
+                enemies.forEach { it.draw(this) }
 
                 projectionMatrix = guiCamera.combined
                 game.bitmapFont.draw(

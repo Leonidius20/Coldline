@@ -3,6 +3,7 @@ package ua.leonidius.coldline.entities
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.MapLayer
@@ -12,14 +13,11 @@ import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.Vector2
 import ua.leonidius.coldline.screens.GameScreen
 
-class Player(sprite: Sprite,
-             private val collisionLayer: TiledMapTileLayer, val gameScreen: GameScreen):
-    Sprite(sprite), InputProcessor {
+class Player(private val collisionLayer: TiledMapTileLayer, val gameScreen: GameScreen):
+    Sprite(Sprite(Texture("player.png"))), InputProcessor {
 
     private val velocity = Vector2()
     private val speed = 60 * 2F
-
-    private val scale = sprite.scaleX
 
     override fun draw(batch: Batch?) {
         update(Gdx.graphics.deltaTime)
@@ -59,7 +57,7 @@ class Player(sprite: Sprite,
 
     private fun isTileWithCollisionAt(mapX: Float, mapY: Float) =
         collisionLayer.run {
-            val cell = getCell((mapX / (tileWidth * scale)).toInt(), (mapY / (tileHeight * scale)).toInt())
+            val cell = getCell((mapX / (tileWidth)).toInt(), (mapY / (tileHeight)).toInt())
             cell?.tile?.properties?.containsKey("blocked") ?: false
         }
 
@@ -69,8 +67,8 @@ class Player(sprite: Sprite,
      * @param y tile's y coordinate
      */
     fun moveToTile(x: Int, y: Int) {
-        setPosition((x * collisionLayer.tileWidth * scale).toFloat(),
-            (y * collisionLayer.tileHeight * scale).toFloat())
+        setPosition((x * collisionLayer.tileWidth).toFloat(),
+            (y * collisionLayer.tileHeight).toFloat())
     }
 
     fun getTileX() = mapToTileX(x)
@@ -113,8 +111,8 @@ class Player(sprite: Sprite,
     /**
      * Convert an X coordinate on the map to a tile X coordinate
      */
-    fun mapToTileX(mapX: Float) = (mapX / (collisionLayer.tileWidth * scale)).toInt()
+    fun mapToTileX(mapX: Float) = (mapX / (collisionLayer.tileWidth)).toInt()
 
-    fun mapToTileY(mapY: Float) = (mapY / (collisionLayer.tileHeight * scale)).toInt()
+    fun mapToTileY(mapY: Float) = (mapY / (collisionLayer.tileHeight)).toInt()
 
 }

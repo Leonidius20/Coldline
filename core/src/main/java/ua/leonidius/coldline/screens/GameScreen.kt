@@ -15,6 +15,7 @@ import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.entities.Player
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
+import ua.leonidius.coldline.pathfinding.algorithms.bfs
 import ua.leonidius.coldline.pathfinding.algorithms.dfs
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 
@@ -61,6 +62,8 @@ class GameScreen(private val game: Main) : Screen {
     private var playerXWhenPathWasBuilt = player.x
     private var playerYWhenPathWasBuilt = player.y
 
+    private var debugInfoToRender = ""
+
     override fun show() {
         Gdx.input.inputProcessor = player
     }
@@ -78,6 +81,11 @@ class GameScreen(private val game: Main) : Screen {
                 player.draw(this)
 
                 projectionMatrix = guiCamera.combined
+                game.bitmapFont.draw(
+                    this,
+                    debugInfoToRender,
+                    0F, 80F
+                )
                 game.bitmapFont.draw(
                     this,
                     "x = ${player.getTileX()}, y = ${player.getTileY()}",
@@ -157,17 +165,31 @@ class GameScreen(private val game: Main) : Screen {
                 val nodeStart = getNodeById(0)!!
                 val nodeEnd = getNodeById(15)!!
 
-                when(currentPathAlgorithm) {
-                    PathAlgorithmTypes.DFS -> dfs(graph, nodeStart, nodeEnd)!!
-                    PathAlgorithmTypes.BFS -> dfs(graph, nodeStart, nodeEnd)!!
-                    PathAlgorithmTypes.UCS -> dfs(graph, nodeStart, nodeEnd)!!
-                    else -> dfs(graph, nodeStart, nodeEnd)!!
+                when(newPathAlgorithm) {
+                    PathAlgorithmTypes.DFS -> {
+                        debugInfoToRender = "DFS"
+                        dfs(graph, nodeStart, nodeEnd)!!
+                    }
+                    PathAlgorithmTypes.BFS -> {
+                        debugInfoToRender = "BFS"
+                        bfs(graph, nodeStart, nodeEnd)!!
+                    }
+                    PathAlgorithmTypes.UCS -> {
+                        debugInfoToRender = "UCS"
+                        dfs(graph, nodeStart, nodeEnd)!!
+                    }
+                    else -> {
+                        debugInfoToRender = "Algo out of bounds"
+                        dfs(graph, nodeStart, nodeEnd)!!
+                    }
                 }
                 // findPath(nodeStart!!, getNodeById(15)!!)
             }
 
             // playerXWhenPathWasBuilt = player.x
             // playerYWhenPathWasBuilt = player.y
+        } else {
+            debugInfoToRender = ""
         }
 
         currentPathAlgorithm = newPathAlgorithm

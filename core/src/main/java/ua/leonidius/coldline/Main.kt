@@ -35,9 +35,6 @@ class Main : Game() {
     override fun dispose() {
         batch.dispose()
         bitmapFont.dispose()
-
-        if (this::gameScreen.isInitialized)
-            gameScreen.dispose()
     }
 
 }

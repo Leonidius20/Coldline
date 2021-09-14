@@ -5,8 +5,7 @@ import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 
-class MapWithObjectsRenderer(private val map1: TiledMap,
-                             private val unitScale1: Float):
+class MapWithObjectsRenderer(map1: TiledMap, unitScale1: Float):
     OrthogonalTiledMapRenderer(map1, unitScale1) {
 
     override fun renderObject(obj: MapObject) {

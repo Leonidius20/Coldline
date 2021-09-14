@@ -12,8 +12,6 @@ class Main : Game() {
     lateinit var batch: SpriteBatch
     lateinit var bitmapFont: BitmapFont
 
-    private lateinit var gameScreen: GameScreen
-
     override fun create() {
         batch = SpriteBatch()
 
@@ -23,9 +21,7 @@ class Main : Game() {
     }
 
     fun toGameScreen() {
-        if (!this::gameScreen.isInitialized)
-            gameScreen = GameScreen(this)
-        setScreen(gameScreen)
+        setScreen(GameScreen(this))
     }
 
     fun toMenuScreen() {

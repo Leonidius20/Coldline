@@ -53,6 +53,7 @@ class GameScreen(private val game: Main) : Screen {
     override fun render(delta: Float) {
         ScreenUtils.clear(0F, 0F, 0.2F, 1F)
 
+        // rendering map and player
         renderer.run {
             setView(camera)
             render()

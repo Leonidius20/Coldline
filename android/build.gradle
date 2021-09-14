@@ -69,6 +69,8 @@ dependencies {
 	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
 	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
+	compile "com.badlogicgames.gdx:gdx-ai:1.8.1"
+
 }
 
 // Called every time gradle gets executed, takes the native dependencies of

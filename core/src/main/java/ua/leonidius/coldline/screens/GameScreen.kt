@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.entities.Player
+import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 
 class GameScreen(private val game: Main) : Screen {
@@ -33,6 +34,7 @@ class GameScreen(private val game: Main) : Screen {
         map.layers[0] as TiledMapTileLayer)
 
     private val objectLayer = map.layers["objects"]
+    private val graph = Graph(objectLayer)
 
     private var exitTileX = 45
     private var exitTileY = 45
@@ -47,6 +49,10 @@ class GameScreen(private val game: Main) : Screen {
     override fun show() {
         player.moveToTile(45, 6)
         Gdx.input.inputProcessor = player
+
+        val path = with(graph) {
+            findPath(getNodeById(0)!!, getNodeById(15)!!)
+        }
     }
 
     override fun render(delta: Float) {

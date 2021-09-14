@@ -4,9 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.maps.objects.TextureMapObject
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.ScreenUtils
@@ -19,16 +18,19 @@ class GameScreen(private val game: Main) : Screen {
 
     private val camera = OrthographicCamera().apply {
         setToOrtho(false, 800F, 480F)
+        zoom = 0.3F
     }
 
     private val guiCamera = OrthographicCamera().apply {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val scale = 3F
+    private val scale = 1F
 
     private val map = TmxMapLoader().load("maps/level2.tmx")
     private val renderer = MapWithObjectsRenderer(map, scale)
+
+    private val shapeRenderer = ShapeRenderer()
 
     private val player = Player(Sprite(Texture("player.png")).apply { setScale(scale) },
         map.layers[0] as TiledMapTileLayer)
@@ -39,20 +41,13 @@ class GameScreen(private val game: Main) : Screen {
     private var exitTileX = 45
     private var exitTileY = 45
 
-    init {
-        /*(objectLayer.objects.get("door") as TextureMapObject).run {
-            exitTileX = x.toInt()
-            exitTileY = x.toInt()
-        }*/
+    private val path = with(graph) {
+        findPath(getNodeById(0)!!, getNodeById(15)!!)
     }
 
     override fun show() {
         player.moveToTile(45, 6)
         Gdx.input.inputProcessor = player
-
-        val path = with(graph) {
-            findPath(getNodeById(0)!!, getNodeById(15)!!)
-        }
     }
 
     override fun render(delta: Float) {
@@ -77,6 +72,19 @@ class GameScreen(private val game: Main) : Screen {
                 end()
             }
         }
+
+        // rendering path
+        shapeRenderer.projectionMatrix = camera.combined
+        Gdx.gl.glLineWidth(10F)
+        // shapeRenderer.scale(scale, scale, 1F)
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
+        path.forEachIndexed { index, graphNodeObject ->
+            if (index != 0) {
+                val startNode = path[index - 1]
+                graph.getConnectionBetween(startNode, graphNodeObject)!!.render(shapeRenderer)
+            }
+        }
+        shapeRenderer.end()
 
         camera.position.set(player.x, player.y, 0F)
         camera.update()

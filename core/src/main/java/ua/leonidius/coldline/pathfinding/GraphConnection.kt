@@ -1,6 +1,9 @@
 package ua.leonidius.coldline.pathfinding
 
 import com.badlogic.gdx.ai.pfa.Connection
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.objects.PolylineMapObject
 
 class GraphConnection(graph: Graph, val polylineObj: PolylineMapObject):
@@ -15,7 +18,11 @@ class GraphConnection(graph: Graph, val polylineObj: PolylineMapObject):
 
     override fun getToNode() = endNode
 
-    fun render() {
+    fun render(shapeRenderer: ShapeRenderer) {
+        shapeRenderer.color = Color.RED
+
+        shapeRenderer.polyline(polylineObj.polyline.transformedVertices)
+
 
     }
 

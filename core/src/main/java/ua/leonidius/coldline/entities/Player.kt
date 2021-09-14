@@ -16,7 +16,7 @@ class Player(sprite: Sprite,
     Sprite(sprite), InputProcessor {
 
     private val velocity = Vector2()
-    private val speed = 60 * 6F
+    private val speed = 60 * 2F
 
     private val scale = sprite.scaleX
 

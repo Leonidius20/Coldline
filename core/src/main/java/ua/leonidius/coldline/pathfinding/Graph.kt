@@ -24,6 +24,11 @@ class Graph(objectLayer: MapLayer): IndexedGraph<GraphNodeObject> {
 
     fun getNodeById(id: Int) = nodes.find { it.getIndex() == id }
 
+    fun getConnectionBetween(startNode: GraphNodeObject, endNode: GraphNodeObject) =
+        connections.find {
+            it.fromNode == startNode && it.toNode == endNode
+        }
+
     override fun getConnections(fromNode: GraphNodeObject): Array<Connection<GraphNodeObject>> =
         Array(connections.filter {
             it.polylineObj.properties["startNode"] == fromNode.getIndex()

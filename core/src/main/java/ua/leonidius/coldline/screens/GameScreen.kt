@@ -32,8 +32,10 @@ class GameScreen(private val game: Main) : Screen {
 
     private val shapeRenderer = ShapeRenderer()
 
-    private val player = Player(Sprite(Texture("player.png")).apply { setScale(scale) },
-        map.layers[0] as TiledMapTileLayer)
+    private val player = Player(
+        Sprite(Texture("player.png")).apply { setScale(scale) },
+        map.layers[0] as TiledMapTileLayer
+    ).apply { moveToTile(45, 6) }
 
     private val objectLayer = map.layers["objects"]
     private val graph = Graph(objectLayer)
@@ -41,12 +43,14 @@ class GameScreen(private val game: Main) : Screen {
     private var exitTileX = 45
     private var exitTileY = 45
 
+    // for map rendering
     private val path = with(graph) {
         findPath(getNodeById(0)!!, getNodeById(15)!!)
     }
+    private var playerXWhenPathWasBuilt = player.x
+    private var playerYWhenPathWasBuilt = player.y
 
     override fun show() {
-        player.moveToTile(45, 6)
         Gdx.input.inputProcessor = player
     }
 
@@ -63,12 +67,16 @@ class GameScreen(private val game: Main) : Screen {
                 player.draw(this)
 
                 projectionMatrix = guiCamera.combined
-                game.bitmapFont.draw(this,
+                game.bitmapFont.draw(
+                    this,
                     "x = ${player.getTileX()}, y = ${player.getTileY()}",
-                    0F, 50F)
-                game.bitmapFont.draw(this,
+                    0F, 50F
+                )
+                game.bitmapFont.draw(
+                    this,
                     "doorX = $exitTileX, doorY = $exitTileY",
-                    0F, 20F)
+                    0F, 20F
+                )
 
                 end()
             }
@@ -79,12 +87,17 @@ class GameScreen(private val game: Main) : Screen {
         Gdx.gl.glLineWidth(10F)
         // shapeRenderer.scale(scale, scale, 1F)
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
+        var startX = 0F
+        var startY = 0F
         path.forEachIndexed { index, graphNodeObject ->
             if (index != 0) {
                 val startNode = path[index - 1]
                 graph.getConnectionBetween(startNode, graphNodeObject)!!.render(shapeRenderer)
+            } else {
+                with(graphNodeObject.rectMapObj.rectangle) { startX = x; startY = y }
             }
         }
+        shapeRenderer.line(playerXWhenPathWasBuilt, playerYWhenPathWasBuilt, startX, startY)
         shapeRenderer.end()
 
         camera.position.set(player.x, player.y, 0F)

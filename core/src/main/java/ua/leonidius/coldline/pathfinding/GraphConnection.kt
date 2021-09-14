@@ -22,8 +22,6 @@ class GraphConnection(graph: Graph, val polylineObj: PolylineMapObject):
         shapeRenderer.color = Color.RED
 
         shapeRenderer.polyline(polylineObj.polyline.transformedVertices)
-
-
     }
 
 }

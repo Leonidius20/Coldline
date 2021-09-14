@@ -17,6 +17,7 @@ import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
 import ua.leonidius.coldline.pathfinding.algorithms.bfs
 import ua.leonidius.coldline.pathfinding.algorithms.dfs
+import ua.leonidius.coldline.pathfinding.algorithms.uniformCostSearch
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 
 class GameScreen(private val game: Main) : Screen {
@@ -176,7 +177,7 @@ class GameScreen(private val game: Main) : Screen {
                     }
                     PathAlgorithmTypes.UCS -> {
                         debugInfoToRender = "UCS"
-                        dfs(graph, nodeStart, nodeEnd)!!
+                        uniformCostSearch(graph, nodeStart, nodeEnd)
                     }
                     else -> {
                         debugInfoToRender = "Algo out of bounds"

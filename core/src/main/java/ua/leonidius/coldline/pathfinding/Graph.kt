@@ -27,7 +27,8 @@ class Graph(objectLayer: MapLayer) : IndexedGraph<GraphNode> {
 
     fun getConnectionBetween(startNode: GraphNode, endNode: GraphNode) =
         connections.find {
-            it.fromNode == startNode && it.toNode == endNode
+            (it.fromNode == startNode && it.toNode == endNode)
+                    || (it.fromNode == endNode && it.toNode == startNode)
         }
 
     override fun getConnections(fromNode: GraphNode): Array<Connection<GraphNode>> =

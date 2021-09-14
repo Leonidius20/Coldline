@@ -10,11 +10,11 @@ import com.badlogic.gdx.maps.objects.PolylineMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.utils.Array
 
-class Graph(objectLayer: MapLayer): IndexedGraph<GraphNodeObject> {
+class Graph(objectLayer: MapLayer): IndexedGraph<GraphNode> {
 
     private val nodes = objectLayer.objects.filter {
         it.properties.containsKey("graphNodeId")
-    }.map { GraphNodeObject(it as RectangleMapObject) }
+    }.map { GraphNode(it as RectangleMapObject) }
 
     private val connections = objectLayer.objects.filter {
         it.properties.containsKey("tag") && it.properties["tag"] == "graphConnection"
@@ -24,23 +24,23 @@ class Graph(objectLayer: MapLayer): IndexedGraph<GraphNodeObject> {
 
     fun getNodeById(id: Int) = nodes.find { it.getIndex() == id }
 
-    fun getConnectionBetween(startNode: GraphNodeObject, endNode: GraphNodeObject) =
+    fun getConnectionBetween(startNode: GraphNode, endNode: GraphNode) =
         connections.find {
             it.fromNode == startNode && it.toNode == endNode
         }
 
-    override fun getConnections(fromNode: GraphNodeObject): Array<Connection<GraphNodeObject>> =
+    override fun getConnections(fromNode: GraphNode): Array<Connection<GraphNode>> =
         Array(connections.filter {
             it.polylineObj.properties["startNode"] == fromNode.getIndex()
         }.toTypedArray())
 
 
-    override fun getIndex(node: GraphNodeObject) = node.getIndex()
+    override fun getIndex(node: GraphNode) = node.getIndex()
 
     override fun getNodeCount() = nodes.size
 
-    fun findPath(startNode: GraphNodeObject, goalNode: GraphNodeObject): GraphPath<GraphNodeObject> {
-        val path = DefaultGraphPath<GraphNodeObject>()
+    fun findPath(startNode: GraphNode, goalNode: GraphNode): GraphPath<GraphNode> {
+        val path = DefaultGraphPath<GraphNode>()
         IndexedAStarPathFinder(this).searchNodePath(startNode, goalNode, heuristic, path)
         return path
     }

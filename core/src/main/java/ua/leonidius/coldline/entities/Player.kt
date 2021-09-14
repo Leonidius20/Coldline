@@ -10,9 +10,10 @@ import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.Vector2
+import ua.leonidius.coldline.screens.GameScreen
 
 class Player(sprite: Sprite,
-             private val collisionLayer: TiledMapTileLayer):
+             private val collisionLayer: TiledMapTileLayer, val gameScreen: GameScreen):
     Sprite(sprite), InputProcessor {
 
     private val velocity = Vector2()
@@ -82,6 +83,7 @@ class Player(sprite: Sprite,
             Input.Keys.A -> velocity.x = -speed
             Input.Keys.S -> velocity.y = -speed
             Input.Keys.D -> velocity.x = speed
+            Input.Keys.Z -> gameScreen.switchPathAlgorithm()
         }
         return true
     }

@@ -2,7 +2,7 @@ package ua.leonidius.coldline.pathfinding
 
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 
-class GraphNodeObject(val rectMapObj: RectangleMapObject) {
+class GraphNode(val rectMapObj: RectangleMapObject) {
 
     fun getIndex() = rectMapObj.properties["graphNodeId"] as Int
 

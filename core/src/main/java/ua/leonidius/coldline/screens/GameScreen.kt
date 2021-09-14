@@ -4,13 +4,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.entities.Player
+import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 
 class GameScreen(private val game: Main) : Screen {
 
@@ -18,11 +20,29 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val map = TmxMapLoader().load("maps/level2.tmx")
-    private val renderer = OrthogonalTiledMapRenderer(map, 3F)
+    private val guiCamera = OrthographicCamera().apply {
+        setToOrtho(false, 800F, 480F)
+    }
 
-    private val player = Player(Sprite(Texture("player.png")).apply { setScale(3F) },
+    private val scale = 3F
+
+    private val map = TmxMapLoader().load("maps/level2.tmx")
+    private val renderer = MapWithObjectsRenderer(map, scale)
+
+    private val player = Player(Sprite(Texture("player.png")).apply { setScale(scale) },
         map.layers[0] as TiledMapTileLayer)
+
+    private val objectLayer = map.layers["objects"]
+
+    private var exitTileX = 45
+    private var exitTileY = 45
+
+    init {
+        /*(objectLayer.objects.get("door") as TextureMapObject).run {
+            exitTileX = x.toInt()
+            exitTileY = x.toInt()
+        }*/
+    }
 
     override fun show() {
         player.moveToTile(45, 6)
@@ -36,8 +56,18 @@ class GameScreen(private val game: Main) : Screen {
             setView(camera)
             render()
             batch.run {
+                projectionMatrix = camera.combined
                 begin()
                 player.draw(this)
+
+                projectionMatrix = guiCamera.combined
+                game.bitmapFont.draw(this,
+                    "x = ${player.getTileX()}, y = ${player.getTileY()}",
+                    0F, 50F)
+                game.bitmapFont.draw(this,
+                    "doorX = $exitTileX, doorY = $exitTileY",
+                    0F, 20F)
+
                 end()
             }
         }
@@ -45,6 +75,10 @@ class GameScreen(private val game: Main) : Screen {
         camera.position.set(player.x, player.y, 0F)
         camera.update()
 
+        // checking if it's the exit
+        if (player.getTileX() == exitTileX && player.getTileY() == exitTileY) {
+            game.toMenuScreen()
+        }
     }
 
     override fun resize(width: Int, height: Int) {
@@ -72,4 +106,5 @@ class GameScreen(private val game: Main) : Screen {
         renderer.dispose()
         player.texture.dispose()
     }
+
 }

@@ -5,14 +5,20 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.Vector2
 
 class Player(sprite: Sprite,
-             private val collisionLayer: TiledMapTileLayer): Sprite(sprite), InputProcessor {
+             private val collisionLayer: TiledMapTileLayer):
+    Sprite(sprite), InputProcessor {
 
     private val velocity = Vector2()
-    private val speed = 60 * 3F
+    private val speed = 60 * 6F
+
+    private val scale = sprite.scaleX
 
     override fun draw(batch: Batch?) {
         update(Gdx.graphics.deltaTime)
@@ -52,8 +58,7 @@ class Player(sprite: Sprite,
 
     private fun isTileWithCollisionAt(mapX: Float, mapY: Float) =
         collisionLayer.run {
-            // 3 = scalefactor
-            val cell = getCell((mapX / (tileWidth * 3)).toInt(), (mapY / (tileHeight * 3)).toInt())
+            val cell = getCell((mapX / (tileWidth * scale)).toInt(), (mapY / (tileHeight * scale)).toInt())
             cell?.tile?.properties?.containsKey("blocked") ?: true
         }
 
@@ -63,10 +68,13 @@ class Player(sprite: Sprite,
      * @param y tile's y coordinate
      */
     fun moveToTile(x: Int, y: Int) {
-        // 3 = scalefactor
-        setPosition((x * collisionLayer.tileWidth * 3).toFloat(),
-            (y * collisionLayer.tileHeight * 3).toFloat())
+        setPosition((x * collisionLayer.tileWidth * scale).toFloat(),
+            (y * collisionLayer.tileHeight * scale).toFloat())
     }
+
+    fun getTileX() = mapToTileX(x)
+
+    fun getTileY() = mapToTileY(y)
 
     override fun keyDown(keycode: Int): Boolean {
         when(keycode) {
@@ -99,5 +107,12 @@ class Player(sprite: Sprite,
     override fun mouseMoved(screenX: Int, screenY: Int) = false
 
     override fun scrolled(amountX: Float, amountY: Float) = false
+
+    /**
+     * Convert an X coordinate on the map to a tile X coordinate
+     */
+    fun mapToTileX(mapX: Float) = (mapX / (collisionLayer.tileWidth * scale)).toInt()
+
+    fun mapToTileY(mapY: Float) = (mapY / (collisionLayer.tileHeight * scale)).toInt()
 
 }

@@ -8,11 +8,12 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedGraph
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.objects.PolylineMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 
-class Graph(objectLayer: MapLayer): IndexedGraph<GraphNode> {
+class Graph(objectLayer: MapLayer) : IndexedGraph<GraphNode> {
 
-    private val nodes = objectLayer.objects.filter {
+    val nodes = objectLayer.objects.filter {
         it.properties.containsKey("graphNodeId")
     }.map { GraphNode(it as RectangleMapObject) }
 
@@ -44,5 +45,17 @@ class Graph(objectLayer: MapLayer): IndexedGraph<GraphNode> {
         IndexedAStarPathFinder(this).searchNodePath(startNode, goalNode, heuristic, path)
         return path
     }
+
+    fun findNearestNodeTo(mapX: Float, mapY: Float) = nodes.minByOrNull {
+        val score = Vector2.dst(it.getX(), it.getY(), mapX, mapY)
+        // add punishment for going through walls
+        score
+    }
+
+    fun getAdjacentNodes(node: GraphNode) = connections
+        .filter { it.fromNode == node || it.toNode == node }
+        .map {
+            if (it.fromNode == node) it.toNode else it.fromNode
+        }
 
 }

@@ -15,6 +15,7 @@ import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.entities.Player
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
+import ua.leonidius.coldline.pathfinding.algorithms.dfs
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 
 class GameScreen(private val game: Main) : Screen {
@@ -149,9 +150,26 @@ class GameScreen(private val game: Main) : Screen {
 
     fun switchPathAlgorithm() {
         val newPathAlgorithm =  PathAlgorithmTypes.values()[(currentPathAlgorithm.id + 1) % PathAlgorithmTypes.values().size]
-        path = with(graph) {
-            findPath(getNodeById(0)!!, getNodeById(15)!!)
+
+        if (newPathAlgorithm != PathAlgorithmTypes.NONE) {
+            path = with(graph) {
+                // val nodeStart = findNearestNodeTo(player.x, player.y)
+                val nodeStart = getNodeById(0)!!
+                val nodeEnd = getNodeById(15)!!
+
+                when(currentPathAlgorithm) {
+                    PathAlgorithmTypes.DFS -> dfs(graph, nodeStart, nodeEnd)!!
+                    PathAlgorithmTypes.BFS -> dfs(graph, nodeStart, nodeEnd)!!
+                    PathAlgorithmTypes.UCS -> dfs(graph, nodeStart, nodeEnd)!!
+                    else -> dfs(graph, nodeStart, nodeEnd)!!
+                }
+                // findPath(nodeStart!!, getNodeById(15)!!)
+            }
+
+            // playerXWhenPathWasBuilt = player.x
+            // playerYWhenPathWasBuilt = player.y
         }
+
         currentPathAlgorithm = newPathAlgorithm
     }
 

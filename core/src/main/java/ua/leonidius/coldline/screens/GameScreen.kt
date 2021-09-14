@@ -2,6 +2,7 @@ package ua.leonidius.coldline.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.ai.pfa.DefaultGraphPath
 import com.badlogic.gdx.ai.pfa.GraphPath
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -10,7 +11,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
+import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.entities.Player
 import ua.leonidius.coldline.pathfinding.Graph
@@ -19,6 +22,8 @@ import ua.leonidius.coldline.pathfinding.algorithms.bfs
 import ua.leonidius.coldline.pathfinding.algorithms.dfs
 import ua.leonidius.coldline.pathfinding.algorithms.uniformCostSearch
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
+import java.math.BigDecimal
+import java.math.BigInteger
 
 class GameScreen(private val game: Main) : Screen {
 
@@ -161,30 +166,39 @@ class GameScreen(private val game: Main) : Screen {
         val newPathAlgorithm =  PathAlgorithmTypes.values()[(currentPathAlgorithm.id + 1) % PathAlgorithmTypes.values().size]
 
         if (newPathAlgorithm != PathAlgorithmTypes.NONE) {
-            path = with(graph) {
+            with(graph) {
                 // val nodeStart = findNearestNodeTo(player.x, player.y)
                 val nodeStart = getNodeById(0)!!
                 val nodeEnd = getNodeById(15)!!
 
+                var timeBefore = BigInteger.ZERO
+                var timeAfter = BigInteger.ZERO
+
+                // path = DefaultGraphPath<GraphNode>() // attempt to fool optimizations
+
                 when(newPathAlgorithm) {
                     PathAlgorithmTypes.DFS -> {
-                        debugInfoToRender = "DFS"
-                        dfs(graph, nodeStart, nodeEnd)!!
+                        timeBefore = TimeUtils.nanoTime().toBigInteger()
+                        path = dfs(graph, nodeStart, nodeEnd)!!
+                        timeAfter = TimeUtils.nanoTime().toBigInteger()
                     }
                     PathAlgorithmTypes.BFS -> {
-                        debugInfoToRender = "BFS"
-                        bfs(graph, nodeStart, nodeEnd)!!
+                        timeBefore = TimeUtils.nanoTime().toBigInteger()
+                        path = bfs(graph, nodeStart, nodeEnd)!!
+                        timeAfter = TimeUtils.nanoTime().toBigInteger()
                     }
                     PathAlgorithmTypes.UCS -> {
-                        debugInfoToRender = "UCS"
-                        uniformCostSearch(graph, nodeStart, nodeEnd)
+                        timeBefore = TimeUtils.nanoTime().toBigInteger()
+                        path = uniformCostSearch(graph, nodeStart, nodeEnd)
+                        timeAfter = TimeUtils.nanoTime().toBigInteger()
                     }
                     else -> {
-                        debugInfoToRender = "Algo out of bounds"
-                        dfs(graph, nodeStart, nodeEnd)!!
+                        path = dfs(graph, nodeStart, nodeEnd)!!
                     }
                 }
-                // findPath(nodeStart!!, getNodeById(15)!!)
+                val timeElapsed = (timeAfter - timeBefore).toDouble() / 1000000.0
+                debugInfoToRender = "${newPathAlgorithm.name}: ${timeElapsed}ms"
+
             }
 
             // playerXWhenPathWasBuilt = player.x

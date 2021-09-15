@@ -21,7 +21,12 @@ class Graph(objectLayer: MapLayer) : IndexedGraph<GraphNode> {
         it.properties.containsKey("tag") && it.properties["tag"] == "graphConnection"
     }.map { GraphConnection(this, it as PolylineMapObject) }
 
-    private val heuristic = DistanceHeuristic()
+    private val adjacencyLists = nodes.associateWith { emptyList<GraphNode>().toMutableList() }.toMutableMap().apply {
+        connections.forEach {
+            this[it.fromNode]!!.add(it.toNode!!)
+            this[it.toNode]!!.add(it.fromNode!!)
+        }
+    }
 
     fun getNodeById(id: Int) = nodes.find { it.getIndex() == id }
 
@@ -41,22 +46,16 @@ class Graph(objectLayer: MapLayer) : IndexedGraph<GraphNode> {
 
     override fun getNodeCount() = nodes.size
 
-    fun findPath(startNode: GraphNode, goalNode: GraphNode): GraphPath<GraphNode> {
-        val path = DefaultGraphPath<GraphNode>()
-        IndexedAStarPathFinder(this).searchNodePath(startNode, goalNode, heuristic, path)
-        return path
-    }
-
     fun findNearestNodeTo(mapX: Float, mapY: Float) = nodes.minByOrNull {
         val score = Vector2.dst(it.getX(), it.getY(), mapX, mapY)
         // add punishment for going through walls
         score
     }
 
-    fun getAdjacentNodes(node: GraphNode) = connections
+    fun getAdjacentNodes(node: GraphNode) = /*connections
         .filter { it.fromNode == node || it.toNode == node }
         .map {
             if (it.fromNode == node) it.toNode else it.fromNode
-        }
+        }*/ adjacencyLists[node]!!
 
 }

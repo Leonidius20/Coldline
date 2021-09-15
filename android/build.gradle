@@ -70,6 +70,7 @@ dependencies {
 	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
 	implementation "com.badlogicgames.gdx:gdx-ai:1.8.1"
+	implementation "com.badlogicgames.ashley:ashley:1.7.3"
 
 }
 

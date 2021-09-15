@@ -12,6 +12,9 @@ class Enemy(private val collisionLayer: TiledMapTileLayer, val gameScreen: GameS
     : Sprite(Sprite(Texture("enemy.png")
 )) {
 
+    private var timeCounter = 0F
+    // private val bullets = emptyArray<>()
+
     // todo: put this in common superclass
     /**
      * Set player's position in the world using tile coordinates
@@ -29,7 +32,12 @@ class Enemy(private val collisionLayer: TiledMapTileLayer, val gameScreen: GameS
     }
 
     private fun update(delta: Float) {
+        timeCounter += delta
+        if (timeCounter >= 1000) {
+            timeCounter = 0F
 
+
+        }
     }
 
     private fun playerInRange() = Vector2.dst(x, y, gameScreen.player.x, gameScreen.player.y) < 4

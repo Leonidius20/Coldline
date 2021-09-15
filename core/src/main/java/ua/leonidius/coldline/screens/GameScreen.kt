@@ -28,8 +28,8 @@ class GameScreen(private val game: Main) : Screen {
 
     enum class PathAlgorithmTypes(val id: Int, val color: Color) {
         NONE(0, Color.CLEAR),
-        DFS(1, Color.RED),
-        BFS(2, Color.YELLOW),
+        BFS(1, Color.YELLOW),
+        DFS(2, Color.RED),
         UCS(3, Color.GREEN)
     }
 

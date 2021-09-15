@@ -1,28 +1,28 @@
-package ua.leonidius.coldline.screens
+package ua.leonidius.coldline.screens.game
 
+import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ai.pfa.GraphPath
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
-import ua.leonidius.coldline.entities.Enemy
-import ua.leonidius.coldline.entities.Player
+import ua.leonidius.coldline.entity.Player
+import ua.leonidius.coldline.entity.createEnemy
+import ua.leonidius.coldline.entity.systems.RenderingSystem
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
 import ua.leonidius.coldline.pathfinding.algorithms.bfs
 import ua.leonidius.coldline.pathfinding.algorithms.dfs
 import ua.leonidius.coldline.pathfinding.algorithms.uniformCostSearch
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
-import java.math.BigDecimal
 import java.math.BigInteger
+
 
 class GameScreen(private val game: Main) : Screen {
 
@@ -47,6 +47,10 @@ class GameScreen(private val game: Main) : Screen {
     private val map = TmxMapLoader().load("maps/level2.tmx")
     private val renderer = MapWithObjectsRenderer(map, scale)
 
+    val engine = PooledEngine().apply {
+        addSystem(RenderingSystem(renderer.batch, camera))
+    }
+
     private val shapeRenderer = ShapeRenderer()
 
     private val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
@@ -69,17 +73,15 @@ class GameScreen(private val game: Main) : Screen {
 
     private var debugInfoToRender = ""
 
-    private val enemies = arrayOf(
-        Enemy(collisionLayer, this).apply { moveToTile(30, 12) },
-        Enemy(collisionLayer, this).apply { moveToTile(30, 24) },
-        Enemy(collisionLayer, this).apply { moveToTile(40, 30) },
-        Enemy(collisionLayer, this).apply { moveToTile(38, 19) },
-        Enemy(collisionLayer, this).apply { moveToTile(16, 45) },
-        Enemy(collisionLayer, this).apply { moveToTile(27, 45) },
-    )
-
     override fun show() {
         Gdx.input.inputProcessor = player
+
+        createEnemy(30, 12)
+        createEnemy(30, 24)
+        createEnemy(40, 30)
+        createEnemy(38, 19)
+        createEnemy(16, 45)
+        createEnemy(27, 45)
     }
 
     override fun render(delta: Float) {
@@ -93,7 +95,6 @@ class GameScreen(private val game: Main) : Screen {
                 projectionMatrix = camera.combined
                 begin()
                 player.draw(this)
-                enemies.forEach { it.draw(this) }
 
                 projectionMatrix = guiCamera.combined
                 game.bitmapFont.draw(
@@ -135,6 +136,8 @@ class GameScreen(private val game: Main) : Screen {
             shapeRenderer.line(playerXWhenPathWasBuilt, playerYWhenPathWasBuilt, startX, startY)
             shapeRenderer.end()
         }
+
+        engine.update(delta)
 
         camera.position.set(player.x, player.y, 0F)
         camera.update()
@@ -218,5 +221,11 @@ class GameScreen(private val game: Main) : Screen {
 
         currentPathAlgorithm = newPathAlgorithm
     }
+
+    fun mapToTileCoordinate(coordinate: Float) =
+        (coordinate / (collisionLayer.tileWidth)).toInt()
+
+    fun tileToMapCoordinate(coordinate: Int) =
+        (coordinate * collisionLayer.tileWidth).toFloat()
 
 }

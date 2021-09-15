@@ -3,7 +3,7 @@ package ua.leonidius.coldline
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import ua.leonidius.coldline.screens.GameScreen
+import ua.leonidius.coldline.screens.game.GameScreen
 import ua.leonidius.coldline.screens.MenuScreen
 
 /** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms.  */

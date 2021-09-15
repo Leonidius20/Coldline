@@ -1,4 +1,4 @@
-package ua.leonidius.coldline.entities
+package ua.leonidius.coldline.entity
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -6,12 +6,9 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.maps.MapLayer
-import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.Vector2
-import ua.leonidius.coldline.screens.GameScreen
+import ua.leonidius.coldline.screens.game.GameScreen
 
 class Player(private val collisionLayer: TiledMapTileLayer, val gameScreen: GameScreen):
     Sprite(Sprite(Texture("player.png"))), InputProcessor {

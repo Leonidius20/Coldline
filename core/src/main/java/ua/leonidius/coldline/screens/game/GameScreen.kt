@@ -13,7 +13,6 @@ import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.entity.Player
-import ua.leonidius.coldline.entity.createEnemy
 import ua.leonidius.coldline.entity.systems.RenderingSystem
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode

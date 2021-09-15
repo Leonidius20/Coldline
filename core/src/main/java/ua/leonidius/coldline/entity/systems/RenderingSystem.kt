@@ -3,30 +3,28 @@ package ua.leonidius.coldline.entity.systems
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.systems.SortedIteratingSystem
+import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import ua.leonidius.coldline.entity.components.PositionComponent
-import ua.leonidius.coldline.entity.components.TextureComponent
+import ua.leonidius.coldline.entity.components.EntityType
+import ua.leonidius.coldline.entity.components.SpriteComponent
+import ua.leonidius.coldline.entity.components.TypeComponent
 
 class RenderingSystem(
     private val batch: Batch,
     private val camera: OrthographicCamera
-) : SortedIteratingSystem(
-    Family.all(
-        PositionComponent::class.java,
-        TextureComponent::class.java
-    ).get(), ZComparator()
-) {
+) : IteratingSystem(Family.all(SpriteComponent::class.java).get(), 3) {
 
     private val renderQueue = ArrayDeque<Entity>()
 
-    private val textureMapper = ComponentMapper.getFor(TextureComponent::class.java)
-    private val positionMapper = ComponentMapper.getFor(PositionComponent::class.java)
+    private val textureMapper = ComponentMapper.getFor(SpriteComponent::class.java)
+    private val typeMapper = ComponentMapper.getFor(TypeComponent::class.java)
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
-        camera.update()
+
+        // renderQueue sort on Z value
+
         with(batch) {
             projectionMatrix = camera.combined
             // enableBlending() idk what this is
@@ -34,24 +32,27 @@ class RenderingSystem(
 
             for (entity in renderQueue) {
                 val textureComponent = textureMapper.get(entity)
-                val positionComponent = positionMapper.get(entity)
+                textureComponent.sprite.draw(this)
 
-                draw(
-                    textureComponent.textureRegion,
-                    positionComponent.position.x,
-                    positionComponent.position.y
-                )
+                if (typeMapper.get(entity).type == EntityType.PLAYER) {
+                    camera.position.apply {
+                        x = textureComponent.sprite.x
+                        y = textureComponent.sprite.y
+                    }
+                }
             }
 
             end()
         }
+
+        camera.update()
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         renderQueue.addLast(entity)
     }
 
-    companion object {
+    /*companion object {
 
         class ZComparator : Comparator<Entity> {
 
@@ -68,6 +69,6 @@ class RenderingSystem(
 
         }
 
-    }
+    }*/
 
 }

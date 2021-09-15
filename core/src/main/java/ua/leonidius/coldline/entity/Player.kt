@@ -22,6 +22,9 @@ class Player(private val collisionLayer: TiledMapTileLayer, val gameScreen: Game
     }
 
     private fun update(delta: Float) {
+
+
+
         val newX = x + velocity.x * delta
         val newY = y + velocity.y * delta
 

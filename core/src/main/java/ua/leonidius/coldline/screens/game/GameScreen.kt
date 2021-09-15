@@ -12,7 +12,10 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
+import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.Player
+import ua.leonidius.coldline.entity.systems.MovementSystem
+import ua.leonidius.coldline.entity.systems.PlayerControlSystem
 import ua.leonidius.coldline.entity.systems.RenderingSystem
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
@@ -41,13 +44,16 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val scale = 1F
-
     private val map = TmxMapLoader().load("maps/level2.tmx")
-    private val renderer = MapWithObjectsRenderer(map, scale)
+    private val renderer = MapWithObjectsRenderer(map, 1F)
+
+    private val keyboardController = KeyboardController()
 
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera))
+        addSystem(PlayerControlSystem(keyboardController))
+        addSystem(MovementSystem())
+        // collision
     }
 
     private val shapeRenderer = ShapeRenderer()
@@ -73,7 +79,7 @@ class GameScreen(private val game: Main) : Screen {
     private var debugInfoToRender = ""
 
     override fun show() {
-        Gdx.input.inputProcessor = player
+        Gdx.input.inputProcessor = keyboardController
 
         createEnemy(30, 12)
         createEnemy(30, 24)
@@ -81,6 +87,8 @@ class GameScreen(private val game: Main) : Screen {
         createEnemy(38, 19)
         createEnemy(16, 45)
         createEnemy(27, 45)
+
+        createPlayer(45, 6)
     }
 
     override fun render(delta: Float) {
@@ -93,7 +101,7 @@ class GameScreen(private val game: Main) : Screen {
             batch.run {
                 projectionMatrix = camera.combined
                 begin()
-                player.draw(this)
+                // player.draw(this)
 
                 projectionMatrix = guiCamera.combined
                 game.bitmapFont.draw(
@@ -101,11 +109,11 @@ class GameScreen(private val game: Main) : Screen {
                     debugInfoToRender,
                     0F, 80F
                 )
-                game.bitmapFont.draw(
+                /*game.bitmapFont.draw(
                     this,
                     "x = ${player.getTileX()}, y = ${player.getTileY()}",
                     0F, 50F
-                )
+                )*/
                 game.bitmapFont.draw(
                     this,
                     "doorX = $exitTileX, doorY = $exitTileY",
@@ -138,8 +146,8 @@ class GameScreen(private val game: Main) : Screen {
 
         engine.update(delta)
 
-        camera.position.set(player.x, player.y, 0F)
-        camera.update()
+        /*camera.position.set(player.x, player.y, 0F)
+        camera.update()*/
 
         // checking if it's the exit
         if (player.getTileX() == exitTileX && player.getTileY() == exitTileY) {

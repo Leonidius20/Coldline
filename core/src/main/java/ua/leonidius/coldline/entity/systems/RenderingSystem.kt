@@ -6,19 +6,27 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import ua.leonidius.coldline.entity.components.EntityType
+import ua.leonidius.coldline.entity.components.PlayerComponent
 import ua.leonidius.coldline.entity.components.SpriteComponent
 import ua.leonidius.coldline.entity.components.TypeComponent
 
 class RenderingSystem(
     private val batch: Batch,
-    private val camera: OrthographicCamera
+    private val camera: OrthographicCamera,
+    private val guiCamera: OrthographicCamera,
+    private val bitmapFont: BitmapFont,
+    private val mapToTileCoordinate: (Float) -> Int
 ) : IteratingSystem(Family.all(SpriteComponent::class.java).get(), 1) {
 
     private val renderQueue = ArrayDeque<Entity>()
 
     private val textureMapper = ComponentMapper.getFor(SpriteComponent::class.java)
     private val typeMapper = ComponentMapper.getFor(TypeComponent::class.java)
+
+    private var lastPlayerX: Int = -1
+    private var lastPlayerY: Int = -1
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
@@ -42,6 +50,19 @@ class RenderingSystem(
                 }
             }
 
+            projectionMatrix = guiCamera.combined
+
+            bitmapFont.draw(
+                this,
+                "x = $lastPlayerX, y = $lastPlayerY",
+                0F, 50F
+            )
+            /*bitmapFont.draw(
+                this,
+                "doorX = $exitTileX, doorY = $exitTileY",
+                0F, 20F
+            )*/
+
             end()
         }
 
@@ -50,6 +71,11 @@ class RenderingSystem(
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         renderQueue.addLast(entity)
+        if (entity.getComponent(PlayerComponent::class.java) != null) {
+            val sprite = entity.getComponent(SpriteComponent::class.java).sprite
+            lastPlayerX = mapToTileCoordinate(sprite.x)
+            lastPlayerY = mapToTileCoordinate(sprite.y)
+        }
     }
 
     /*companion object {

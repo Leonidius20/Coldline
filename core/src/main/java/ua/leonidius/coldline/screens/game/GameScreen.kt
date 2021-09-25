@@ -53,7 +53,8 @@ class GameScreen(private val game: Main) : Screen {
     private val keyboardController = KeyboardController()
 
     val engine = PooledEngine().apply {
-        addSystem(RenderingSystem(renderer.batch, camera))
+        addSystem(RenderingSystem(renderer.batch, camera,
+            guiCamera, game.bitmapFont, ::mapToTileCoordinate))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
         addSystem(CollisionSystem(collisionLayer))
@@ -104,7 +105,7 @@ class GameScreen(private val game: Main) : Screen {
                 begin()
                 // player.draw(this)
 
-                projectionMatrix = guiCamera.combined
+                /*projectionMatrix = guiCamera.combined
                 game.bitmapFont.draw(
                     this,
                     debugInfoToRender,
@@ -119,7 +120,7 @@ class GameScreen(private val game: Main) : Screen {
                     this,
                     "doorX = $exitTileX, doorY = $exitTileY",
                     0F, 20F
-                )
+                )*/
 
                 end()
             }

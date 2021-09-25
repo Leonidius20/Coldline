@@ -12,10 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.SpriteComponent
-import ua.leonidius.coldline.entity.systems.CollisionSystem
-import ua.leonidius.coldline.entity.systems.MovementSystem
-import ua.leonidius.coldline.entity.systems.PlayerControlSystem
-import ua.leonidius.coldline.entity.systems.RenderingSystem
+import ua.leonidius.coldline.entity.systems.*
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 import ua.leonidius.coldline.renderer.PathRenderer
 
@@ -43,7 +40,8 @@ class GameScreen(private val game: Main) : Screen {
             guiCamera, game.bitmapFont, ::mapToTileCoordinate))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
-        addSystem(CollisionSystem(collisionLayer))
+        addSystem(WallCollisionSystem(collisionLayer))
+        addSystem(EntityCollisionSystem())
     }
 
     private val pathRenderer = PathRenderer(this, camera, map.layers["objects"])
@@ -65,6 +63,8 @@ class GameScreen(private val game: Main) : Screen {
 
         val player = createPlayer(45, 6)
         playerSprite = player.getComponent(SpriteComponent::class.java).sprite
+
+        createDoor(exitTileX, exitTileX) // TODO: make these coords work
     }
 
     override fun render(delta: Float) {

@@ -9,7 +9,7 @@ import ua.leonidius.coldline.entity.components.CollisionComponent
 import ua.leonidius.coldline.entity.components.MovementComponent
 import ua.leonidius.coldline.entity.components.SpriteComponent
 
-class CollisionSystem(private val collisionLayer: TiledMapTileLayer): IteratingSystem(
+class WallCollisionSystem(private val collisionLayer: TiledMapTileLayer): IteratingSystem(
     Family.all(MovementComponent::class.java, CollisionComponent::class.java).get(), 2) {
 
     private val spriteMapper: ComponentMapper<SpriteComponent>

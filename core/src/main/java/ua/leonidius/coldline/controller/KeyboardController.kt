@@ -2,8 +2,9 @@ package ua.leonidius.coldline.controller
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
+import ua.leonidius.coldline.screens.game.GameScreen
 
-class KeyboardController: InputProcessor {
+class KeyboardController(private val gameScreen: GameScreen): InputProcessor {
 
     var left = false
     var right = false
@@ -16,7 +17,7 @@ class KeyboardController: InputProcessor {
             Input.Keys.A -> left = true
             Input.Keys.S -> down = true
             Input.Keys.D -> right = true
-            // Input.Keys.Z -> gameScreen.switchPathAlgorithm()
+            Input.Keys.Z -> gameScreen.switchPathAlgo()
         }
         return true
     }

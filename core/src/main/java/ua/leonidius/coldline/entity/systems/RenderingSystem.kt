@@ -50,19 +50,6 @@ class RenderingSystem(
                 }
             }
 
-            projectionMatrix = guiCamera.combined
-
-            bitmapFont.draw(
-                this,
-                "x = $lastPlayerX, y = $lastPlayerY",
-                0F, 50F
-            )
-            /*bitmapFont.draw(
-                this,
-                "doorX = $exitTileX, doorY = $exitTileY",
-                0F, 20F
-            )*/
-
             end()
         }
 

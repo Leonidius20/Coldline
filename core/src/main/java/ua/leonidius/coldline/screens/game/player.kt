@@ -1,12 +1,11 @@
 package ua.leonidius.coldline.screens.game
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.Vector3
 import ua.leonidius.coldline.entity.components.*
 
-fun GameScreen.createPlayer(tileX: Int, tileY: Int) {
+fun GameScreen.createPlayer(tileX: Int, tileY: Int): Entity {
     with(engine) {
         createEntity().run {
             /*add(createComponent(PositionComponent::class.java).apply {
@@ -35,6 +34,8 @@ fun GameScreen.createPlayer(tileX: Int, tileY: Int) {
             add(createComponent(PlayerComponent::class.java))
 
             addEntity(this)
+
+            return this
         }
     }
 }

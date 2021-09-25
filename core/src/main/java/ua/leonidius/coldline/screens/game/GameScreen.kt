@@ -3,38 +3,24 @@ package ua.leonidius.coldline.screens.game
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.ai.pfa.GraphPath
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.ScreenUtils
-import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
-import ua.leonidius.coldline.entity.Player
+import ua.leonidius.coldline.entity.components.SpriteComponent
 import ua.leonidius.coldline.entity.systems.CollisionSystem
 import ua.leonidius.coldline.entity.systems.MovementSystem
 import ua.leonidius.coldline.entity.systems.PlayerControlSystem
 import ua.leonidius.coldline.entity.systems.RenderingSystem
-import ua.leonidius.coldline.pathfinding.Graph
-import ua.leonidius.coldline.pathfinding.GraphNode
-import ua.leonidius.coldline.pathfinding.algorithms.bfs
-import ua.leonidius.coldline.pathfinding.algorithms.dfs
-import ua.leonidius.coldline.pathfinding.algorithms.uniformCostSearch
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
-import java.math.BigInteger
+import ua.leonidius.coldline.renderer.PathRenderer
 
 
 class GameScreen(private val game: Main) : Screen {
-
-    enum class PathAlgorithmTypes(val id: Int, val color: Color) {
-        NONE(0, Color.CLEAR),
-        BFS(1, Color.YELLOW),
-        DFS(2, Color.RED),
-        UCS(3, Color.GREEN)
-    }
 
     private val camera = OrthographicCamera().apply {
         setToOrtho(false, 800F, 480F)
@@ -50,7 +36,7 @@ class GameScreen(private val game: Main) : Screen {
 
     private val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
 
-    private val keyboardController = KeyboardController()
+    private val keyboardController = KeyboardController(this)
 
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera,
@@ -60,25 +46,12 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(CollisionSystem(collisionLayer))
     }
 
-    private val shapeRenderer = ShapeRenderer()
-
-    private val player = Player(collisionLayer, this)
-        .apply { moveToTile(45, 6) }
-
-    private val objectLayer = map.layers["objects"]
-    private val graph = Graph(objectLayer)
+    private val pathRenderer = PathRenderer(this, camera, map.layers["objects"])
 
     private var exitTileX = 45
     private var exitTileY = 45
 
-    // for path rendering
-    private var currentPathAlgorithm = PathAlgorithmTypes.NONE
-
-    private lateinit var path: GraphPath<GraphNode>
-    private var playerXWhenPathWasBuilt = player.x
-    private var playerYWhenPathWasBuilt = player.y
-
-    private var debugInfoToRender = ""
+    private lateinit var playerSprite: Sprite
 
     override fun show() {
         Gdx.input.inputProcessor = keyboardController
@@ -90,7 +63,8 @@ class GameScreen(private val game: Main) : Screen {
         createEnemy(16, 45)
         createEnemy(27, 45)
 
-        createPlayer(45, 6)
+        val player = createPlayer(45, 6)
+        playerSprite = player.getComponent(SpriteComponent::class.java).sprite
     }
 
     override fun render(delta: Float) {
@@ -100,61 +74,24 @@ class GameScreen(private val game: Main) : Screen {
         renderer.run {
             setView(camera)
             render()
-            batch.run {
-                projectionMatrix = camera.combined
+
+            with(batch) {
                 begin()
-                // player.draw(this)
-
-                /*projectionMatrix = guiCamera.combined
-                game.bitmapFont.draw(
-                    this,
-                    debugInfoToRender,
-                    0F, 80F
-                )
-                /*game.bitmapFont.draw(
-                    this,
-                    "x = ${player.getTileX()}, y = ${player.getTileY()}",
-                    0F, 50F
-                )*/
-                game.bitmapFont.draw(
-                    this,
-                    "doorX = $exitTileX, doorY = $exitTileY",
-                    0F, 20F
-                )*/
-
+                projectionMatrix = guiCamera.combined
+                printDebugData(this)
                 end()
             }
         }
 
         // rendering path
-        if (currentPathAlgorithm != PathAlgorithmTypes.NONE) {
-            shapeRenderer.projectionMatrix = camera.combined
-            Gdx.gl.glLineWidth(10F)
-            // shapeRenderer.scale(scale, scale, 1F)
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-            var startX = 0F
-            var startY = 0F
-            path.forEachIndexed { index, graphNodeObject ->
-                if (index != 0) {
-                    val startNode = path[index - 1]
-                    graph.getConnectionBetween(startNode, graphNodeObject)!!.render(shapeRenderer, currentPathAlgorithm.color)
-                } else {
-                    with(graphNodeObject.rectMapObj.rectangle) { startX = x; startY = y }
-                }
-            }
-            shapeRenderer.line(playerXWhenPathWasBuilt, playerYWhenPathWasBuilt, startX, startY)
-            shapeRenderer.end()
-        }
+        pathRenderer.render()
 
         engine.update(delta)
 
-        /*camera.position.set(player.x, player.y, 0F)
-        camera.update()*/
-
         // checking if it's the exit
-        if (player.getTileX() == exitTileX && player.getTileY() == exitTileY) {
+        /*if (player.getTileX() == exitTileX && player.getTileY() == exitTileY) {
             game.toMenuScreen()
-        }
+        }*/
     }
 
     override fun resize(width: Int, height: Int) {
@@ -165,13 +102,9 @@ class GameScreen(private val game: Main) : Screen {
         }
     }
 
-    override fun pause() {
+    override fun pause() {}
 
-    }
-
-    override fun resume() {
-
-    }
+    override fun resume() {}
 
     override fun hide() {
         dispose()
@@ -180,61 +113,60 @@ class GameScreen(private val game: Main) : Screen {
     override fun dispose() {
         map.dispose()
         renderer.dispose()
-        player.texture.dispose()
+        playerSprite.texture.dispose()
     }
 
-    fun switchPathAlgorithm() {
-        val newPathAlgorithm =  PathAlgorithmTypes.values()[(currentPathAlgorithm.id + 1) % PathAlgorithmTypes.values().size]
-
-        if (newPathAlgorithm != PathAlgorithmTypes.NONE) {
-            with(graph) {
-                // val nodeStart = findNearestNodeTo(player.x, player.y)
-                val nodeStart = getNodeById(0)!!
-                val nodeEnd = getNodeById(15)!!
-
-                var timeBefore = BigInteger.ZERO
-                var timeAfter = BigInteger.ZERO
-
-                // path = DefaultGraphPath<GraphNode>() // attempt to fool optimizations
-
-                when(newPathAlgorithm) {
-                    PathAlgorithmTypes.DFS -> {
-                        timeBefore = TimeUtils.nanoTime().toBigInteger()
-                        path = dfs(graph, nodeStart, nodeEnd)!!
-                        timeAfter = TimeUtils.nanoTime().toBigInteger()
-                    }
-                    PathAlgorithmTypes.BFS -> {
-                        timeBefore = TimeUtils.nanoTime().toBigInteger()
-                        path = bfs(graph, nodeStart, nodeEnd)!!
-                        timeAfter = TimeUtils.nanoTime().toBigInteger()
-                    }
-                    PathAlgorithmTypes.UCS -> {
-                        timeBefore = TimeUtils.nanoTime().toBigInteger()
-                        path = uniformCostSearch(graph, nodeStart, nodeEnd)
-                        timeAfter = TimeUtils.nanoTime().toBigInteger()
-                    }
-                    else -> {
-                        path = dfs(graph, nodeStart, nodeEnd)!!
-                    }
-                }
-                val timeElapsed = (timeAfter - timeBefore).toDouble() / 1000000.0
-                debugInfoToRender = "${newPathAlgorithm.name}: ${timeElapsed}ms"
-
-            }
-
-            // playerXWhenPathWasBuilt = player.x
-            // playerYWhenPathWasBuilt = player.y
-        } else {
-            debugInfoToRender = ""
-        }
-
-        currentPathAlgorithm = newPathAlgorithm
+    fun switchPathAlgo() {
+        pathRenderer.switchPathAlgorithm()
     }
 
-    fun mapToTileCoordinate(coordinate: Float) =
+    private fun mapToTileCoordinate(coordinate: Float) =
         (coordinate / (collisionLayer.tileWidth)).toInt()
 
     fun tileToMapCoordinate(coordinate: Int) =
         (coordinate * collisionLayer.tileWidth).toFloat()
+
+    fun getPlayerX() = playerSprite.x
+
+    fun getPlayerY() = playerSprite.y
+
+    fun getPlayerTileX() = mapToTileCoordinate(getPlayerX())
+
+    fun getPlayerTileY() = mapToTileCoordinate(getPlayerY())
+
+    private fun printDebugData(batch: Batch) {
+        printPathComputeTime(batch)
+        printPlayerLocation(batch)
+        printDoorLocation(batch)
+    }
+
+    private fun printPathComputeTime(batch: Batch) {
+        pathRenderer.let {
+            if (it.lastUsedAlgorithm.isNotEmpty()) {
+                game.bitmapFont.draw(
+                    batch,
+                    "${it.lastUsedAlgorithm}: ${it.lastComputeTime}ms",
+                    0F, 80F
+                )
+            }
+        }
+    }
+
+    private fun printDoorLocation(batch: Batch) {
+        game.bitmapFont.draw(
+            batch,
+            "doorX = $exitTileX, doorY = $exitTileY",
+            0F, 20F
+        )
+    }
+
+    private fun printPlayerLocation(batch: Batch) {
+        game.bitmapFont.draw(
+            batch,
+            "x = ${getPlayerTileX()}, y = ${getPlayerTileY()}",
+            0F, 50F
+        )
+
+    }
 
 }

@@ -81,7 +81,7 @@ class Player(private val collisionLayer: TiledMapTileLayer, val gameScreen: Game
             Input.Keys.A -> velocity.x = -speed
             Input.Keys.S -> velocity.y = -speed
             Input.Keys.D -> velocity.x = speed
-            Input.Keys.Z -> gameScreen.switchPathAlgorithm()
+
         }
         return true
     }

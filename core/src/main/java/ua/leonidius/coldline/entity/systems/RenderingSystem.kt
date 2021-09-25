@@ -13,7 +13,7 @@ import ua.leonidius.coldline.entity.components.TypeComponent
 class RenderingSystem(
     private val batch: Batch,
     private val camera: OrthographicCamera
-) : IteratingSystem(Family.all(SpriteComponent::class.java).get(), 3) {
+) : IteratingSystem(Family.all(SpriteComponent::class.java).get(), 1) {
 
     private val renderQueue = ArrayDeque<Entity>()
 

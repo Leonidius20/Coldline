@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.Player
+import ua.leonidius.coldline.entity.systems.CollisionSystem
 import ua.leonidius.coldline.entity.systems.MovementSystem
 import ua.leonidius.coldline.entity.systems.PlayerControlSystem
 import ua.leonidius.coldline.entity.systems.RenderingSystem
@@ -47,20 +48,20 @@ class GameScreen(private val game: Main) : Screen {
     private val map = TmxMapLoader().load("maps/level2.tmx")
     private val renderer = MapWithObjectsRenderer(map, 1F)
 
+    private val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
+
     private val keyboardController = KeyboardController()
 
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
-        // collision
+        addSystem(CollisionSystem(collisionLayer))
     }
 
     private val shapeRenderer = ShapeRenderer()
 
-    private val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
-
-    val player = Player(collisionLayer, this)
+    private val player = Player(collisionLayer, this)
         .apply { moveToTile(45, 6) }
 
     private val objectLayer = map.layers["objects"]

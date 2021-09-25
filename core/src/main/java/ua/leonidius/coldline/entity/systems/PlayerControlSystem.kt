@@ -14,7 +14,7 @@ import ua.leonidius.coldline.entity.components.PlayerComponent
 class PlayerControlSystem(
     private val keyboardController: KeyboardController
 ): IteratingSystem(
-    Family.all(PlayerComponent::class.java).get(), 1
+    Family.all(PlayerComponent::class.java).get(), 0
 ) {
 
     private val movementMapper = ComponentMapper.getFor(MovementComponent::class.java)

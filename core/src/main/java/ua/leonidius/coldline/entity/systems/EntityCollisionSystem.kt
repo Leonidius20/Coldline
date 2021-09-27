@@ -12,7 +12,13 @@ import ua.leonidius.coldline.entity.components.TypeComponent
 /**
  * A system for detecting when player is colliding with an entity
  */
-class EntityCollisionSystem(private val doorX: Int, private val doorY: Int): IteratingSystem(
+class EntityCollisionSystem(private val doorX: Int,
+                            private val doorY: Int,
+                            private val mapToTileCoord: (Float) -> Int,
+                            private val onDoorCollision: () -> Unit): IteratingSystem(
+
+    // TODO: instead of getting door x and y here just get door entity coordinates
+
     Family.all(SpriteComponent::class.java, CollisionComponent::class.java, TypeComponent::class.java).get()) {
 
     private val typeMapper = ComponentMapper.getFor(TypeComponent::class.java)
@@ -21,6 +27,10 @@ class EntityCollisionSystem(private val doorX: Int, private val doorY: Int): Ite
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         if (typeMapper.get(entity).type == EntityType.PLAYER) {
             with(spriteMapper.get(entity).sprite) {
+                if (mapToTileCoord(x) == doorX && mapToTileCoord(y) == doorY) {
+                    // TODO: emit event to end the game
+                    onDoorCollision()
+                }
                 // check is tile X is the same as door's
             }
         }

@@ -35,19 +35,20 @@ class GameScreen(private val game: Main) : Screen {
 
     private val keyboardController = KeyboardController(this)
 
+    private var exitTileX = 45
+    private var exitTileY = 45
+
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera,
             guiCamera, game.bitmapFont, ::mapToTileCoordinate))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
         addSystem(WallCollisionSystem(collisionLayer))
-        addSystem(EntityCollisionSystem())
+        addSystem(EntityCollisionSystem(exitTileX, exitTileY,
+            ::mapToTileCoordinate, game::toMenuScreen))
     }
 
     private val pathRenderer = PathRenderer(this, camera, map.layers["objects"])
-
-    private var exitTileX = 45
-    private var exitTileY = 45
 
     private lateinit var playerSprite: Sprite
 

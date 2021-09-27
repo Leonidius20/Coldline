@@ -6,13 +6,12 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.SpriteComponent
 import ua.leonidius.coldline.entity.systems.*
+import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 import ua.leonidius.coldline.renderer.PathRenderer
 
@@ -28,10 +27,8 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val map = TmxMapLoader().load("maps/level2.tmx")
-    private val renderer = MapWithObjectsRenderer(map, 1F)
-
-    private val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
+    private val level = Level.load("maps/level2.tmx")
+    private val renderer = MapWithObjectsRenderer(level, 1F)
 
     private val keyboardController = KeyboardController(this)
 
@@ -43,12 +40,13 @@ class GameScreen(private val game: Main) : Screen {
             guiCamera, game.bitmapFont, ::mapToTileCoordinate))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
-        addSystem(WallCollisionSystem(collisionLayer))
-        addSystem(EntityCollisionSystem(exitTileX, exitTileY,
+        addSystem(WallCollisionSystem(level.collisionLayer))
+        addSystem(EntityCollisionSystem(
+            { exitTileX }, { exitTileY },
             ::mapToTileCoordinate, game::toMenuScreen))
     }
 
-    private val pathRenderer = PathRenderer(this, camera, map.layers["objects"])
+    private val pathRenderer = PathRenderer(this, camera, level.objectLayer)
 
     private lateinit var playerSprite: Sprite
 
@@ -88,11 +86,6 @@ class GameScreen(private val game: Main) : Screen {
         pathRenderer.render()
 
         engine.update(delta)
-
-        // checking if it's the exit
-        /*if (player.getTileX() == exitTileX && player.getTileY() == exitTileY) {
-            game.toMenuScreen()
-        }*/
     }
 
     override fun resize(width: Int, height: Int) {
@@ -112,7 +105,7 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     override fun dispose() {
-        map.dispose()
+        level.dispose()
         renderer.dispose()
         playerSprite.texture.dispose()
     }
@@ -122,10 +115,10 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     private fun mapToTileCoordinate(coordinate: Float) =
-        (coordinate / (collisionLayer.tileWidth)).toInt()
+        (coordinate / (level.collisionLayer.tileWidth)).toInt()
 
     fun tileToMapCoordinate(coordinate: Int) =
-        (coordinate * collisionLayer.tileWidth).toFloat()
+        (coordinate * level.collisionLayer.tileWidth).toFloat()
 
     fun getPlayerX() = playerSprite.x
 

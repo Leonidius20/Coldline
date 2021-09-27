@@ -8,12 +8,13 @@ import ua.leonidius.coldline.entity.components.CollisionComponent
 import ua.leonidius.coldline.entity.components.EntityType
 import ua.leonidius.coldline.entity.components.SpriteComponent
 import ua.leonidius.coldline.entity.components.TypeComponent
+import kotlin.properties.Delegates
 
 /**
  * A system for detecting when player is colliding with an entity
  */
-class EntityCollisionSystem(private val doorX: Int,
-                            private val doorY: Int,
+class EntityCollisionSystem(private val getDoorX: () -> Int,
+                            private val getDoorY: () -> Int,
                             private val mapToTileCoord: (Float) -> Int,
                             private val onDoorCollision: () -> Unit): IteratingSystem(
 
@@ -27,7 +28,7 @@ class EntityCollisionSystem(private val doorX: Int,
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         if (typeMapper.get(entity).type == EntityType.PLAYER) {
             with(spriteMapper.get(entity).sprite) {
-                if (mapToTileCoord(x) == doorX && mapToTileCoord(y) == doorY) {
+                if (mapToTileCoord(x) == getDoorX() && mapToTileCoord(y) == getDoorY()) {
                     // TODO: emit event to end the game
                     onDoorCollision()
                 }

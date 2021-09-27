@@ -4,9 +4,10 @@ import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import ua.leonidius.coldline.level.Level
 
-class MapWithObjectsRenderer(map1: TiledMap, unitScale1: Float):
-    OrthogonalTiledMapRenderer(map1, unitScale1) {
+class MapWithObjectsRenderer(level: Level, unitScale1: Float):
+    OrthogonalTiledMapRenderer(level.map, unitScale1) {
 
     override fun renderObject(obj: MapObject) {
         if (obj is TextureMapObject) {

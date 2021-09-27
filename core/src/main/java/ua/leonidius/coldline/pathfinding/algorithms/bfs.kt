@@ -25,7 +25,7 @@ fun bfs(
 
                 if (adjacentNode == endNode) return DefaultGraphPath(newPath)
 
-                discoveredNode[adjacentNode!!] = true
+                discoveredNode[adjacentNode] = true
             }
         }
 

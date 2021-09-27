@@ -2,19 +2,23 @@ package ua.leonidius.coldline.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.maps.tiled.TiledMapTileSet
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 
 /** First screen of the application. Displayed after the application is created.  */
 class MenuScreen(private val game: Main) : Screen {
 
+    private var doneLoading = false
+
     private val camera = OrthographicCamera().apply {
         setToOrtho(false, 800F, 480F)
     }
 
     override fun show() {
-        // Prepare your screen here.
+
     }
 
     override fun render(delta: Float) {
@@ -29,10 +33,14 @@ class MenuScreen(private val game: Main) : Screen {
             bitmapFont.draw(batch, "Welcome", 100F, 150F)
             bitmapFont.draw(batch, "Tap anywhere to begin", 100F, 100F)
 
+            if (!assetManager.update(17)) {
+                bitmapFont.draw(batch, "Loading assets...", 400F, 240F)
+            } else doneLoading = true
+
             batch.end()
         }
 
-        if (Gdx.input.isTouched)
+        if (Gdx.input.isTouched && doneLoading)
             game.toGameScreen()
             dispose()
     }

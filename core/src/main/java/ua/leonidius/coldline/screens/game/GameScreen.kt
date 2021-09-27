@@ -3,6 +3,7 @@ package ua.leonidius.coldline.screens.game
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
@@ -27,7 +28,11 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val level = Level.load("maps/level2.tmx")
+    private val assetManager = AssetManager()
+
+    // TODO: create tile set loader
+    private val tileSet = Level.load("maps/level2.tmx").map.tileSets.getTileSet(0)
+    private val level = Level.generate(tileSet)
     private val renderer = MapWithObjectsRenderer(level, 1F)
 
     private val keyboardController = KeyboardController(this)

@@ -19,7 +19,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     private val tileWidth = 16
     private val tileHeight = 16
 
-    private val blankTile = tileSet.getTile(100)
+    private val blankTile = tileSet.getTile(101)
     private val horizontalWallTileBottom = tileSet.getTile(41)
     private val horizontalWallTileTop = tileSet.getTile(2)
     private val verticalWallTileRight = tileSet.getTile(14)

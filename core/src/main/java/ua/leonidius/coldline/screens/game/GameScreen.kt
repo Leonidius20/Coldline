@@ -34,13 +34,14 @@ class GameScreen(private val game: Main) : Screen {
 
     // TODO: create tile set loader
     private val tileSet = Level.load("maps/level2.tmx").map.tileSets.getTileSet(0)
-    private val level = LevelGenerator(tileSet).generate()
+    private val levelGenerator = LevelGenerator(tileSet)
+    private val level = levelGenerator.generate()
     private val renderer = MapWithObjectsRenderer(level, 1F)
 
     private val keyboardController = KeyboardController(this)
 
-    private var exitTileX = 45
-    private var exitTileY = 45
+    private var exitTileX = levelGenerator.doorTileX
+    private var exitTileY = levelGenerator.doorTileY
 
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera,
@@ -53,7 +54,8 @@ class GameScreen(private val game: Main) : Screen {
             ::mapToTileCoordinate, game::toMenuScreen))
     }
 
-    private val pathRenderer = PathRenderer(this, camera, level.objectLayer)
+    private val pathRenderer = PathRenderer(this, camera,
+        level.collisionLayer, level.objectLayer, tileSet.getTile(95))
 
     private lateinit var playerSprite: Sprite
 
@@ -72,7 +74,7 @@ class GameScreen(private val game: Main) : Screen {
             playerSprite = player.getComponent(SpriteComponent::class.java).sprite
         }
 
-        createDoor(exitTileX, exitTileX) // TODO: make these coords work
+        createDoor(exitTileX, exitTileX)
     }
 
     override fun render(delta: Float) {

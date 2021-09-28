@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.tiled.TiledMapTile
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
@@ -17,7 +19,8 @@ import java.math.BigInteger
 
 class PathRenderer(private val gameScreen: GameScreen,
                    private val camera: OrthographicCamera,
-                   objectLayer: MapLayer) {
+                   collisionLayer: TiledMapTileLayer,
+                   objectLayer: MapLayer, floorTile: TiledMapTile) {
 
     enum class PathAlgorithmTypes(val id: Int, val color: Color) {
         NONE(0, Color.CLEAR),
@@ -28,13 +31,13 @@ class PathRenderer(private val gameScreen: GameScreen,
 
     private val shapeRenderer = ShapeRenderer()
 
-    private val graph = Graph(objectLayer)
+    val graph = Graph(collisionLayer, objectLayer, floorTile)
 
     private var currentPathAlgorithm = PathAlgorithmTypes.NONE
 
     private lateinit var path: GraphPath<GraphNode>
-    private var playerXWhenPathWasBuilt = -1F
-    private var playerYWhenPathWasBuilt = -1F
+    // private var playerXWhenPathWasBuilt = -1F
+    // private var playerYWhenPathWasBuilt = -1F
 
     var lastUsedAlgorithm = ""
     var lastComputeTime = -1.0
@@ -45,14 +48,14 @@ class PathRenderer(private val gameScreen: GameScreen,
             Gdx.gl.glLineWidth(10F)
             // shapeRenderer.scale(scale, scale, 1F)
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-            var startX = 0F
-            var startY = 0F
+            //var startX = 0F
+            //var startY = 0F
             path.forEachIndexed { index, graphNodeObject ->
                 if (index != 0) {
                     val startNode = path[index - 1]
                     graph.getConnectionBetween(startNode, graphNodeObject)!!.render(shapeRenderer, currentPathAlgorithm.color)
                 } else {
-                    with(graphNodeObject.rectMapObj.rectangle) { startX = x; startY = y }
+                    // with(graphNodeObject.rectMapObj.rectangle) { startX = x; startY = y }
                 }
             }
             // shapeRenderer.line(playerXWhenPathWasBuilt, playerYWhenPathWasBuilt, startX, startY)
@@ -66,8 +69,8 @@ class PathRenderer(private val gameScreen: GameScreen,
         if (newPathAlgorithm != PathAlgorithmTypes.NONE) {
             with(graph) {
                 // val nodeStart = findNearestNodeTo(player.x, player.y)
-                val nodeStart = getNodeById(0)!!
-                val nodeEnd = getNodeById(15)!!
+                val nodeStart = graph.startNode
+                val nodeEnd = graph.endNode
 
                 var timeBefore = BigInteger.ZERO
                 var timeAfter = BigInteger.ZERO
@@ -100,8 +103,8 @@ class PathRenderer(private val gameScreen: GameScreen,
 
             }
 
-            playerXWhenPathWasBuilt = gameScreen.getPlayerX()
-            playerYWhenPathWasBuilt = gameScreen.getPlayerY()
+            // playerXWhenPathWasBuilt = gameScreen.getPlayerX()
+            // playerYWhenPathWasBuilt = gameScreen.getPlayerY()
         } else {
             lastUsedAlgorithm = ""
         }

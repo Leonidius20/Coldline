@@ -30,6 +30,9 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     private lateinit var collisionLayer: TiledMapTileLayer
     private lateinit var objectLayer: MapLayer
 
+    var doorTileX = -1
+    var doorTileY = -1
+
     fun generate(): Level {
         val grid = Grid(width / 2, height / 2)
 
@@ -134,6 +137,8 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         for (y in height - 2 downTo 1) {
             for (x in 1 until width - 2) {
                 if (is3x3RadiusEmpty(x, y)) {
+                    doorTileX = x
+                    doorTileY = y
                     objectLayer.objects.add(TiledMapTileMapObject(doorTile, false, false).apply {
                         name = "door"
                         this.x = (x * tileWidth).toFloat()

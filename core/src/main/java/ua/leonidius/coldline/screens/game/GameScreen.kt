@@ -13,6 +13,7 @@ import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.SpriteComponent
 import ua.leonidius.coldline.entity.systems.*
 import ua.leonidius.coldline.level.Level
+import ua.leonidius.coldline.level.LevelGenerator
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 import ua.leonidius.coldline.renderer.PathRenderer
 
@@ -32,7 +33,7 @@ class GameScreen(private val game: Main) : Screen {
 
     // TODO: create tile set loader
     private val tileSet = Level.load("maps/level2.tmx").map.tileSets.getTileSet(0)
-    private val level = Level.generate(tileSet)
+    private val level = LevelGenerator(tileSet).generate()
     private val renderer = MapWithObjectsRenderer(level, 1F)
 
     private val keyboardController = KeyboardController(this)

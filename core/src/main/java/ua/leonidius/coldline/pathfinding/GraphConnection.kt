@@ -7,8 +7,8 @@ import com.badlogic.gdx.maps.objects.PolylineMapObject
 import com.badlogic.gdx.math.Polyline
 
 class GraphConnection(val startNode: GraphNode, val endNode: GraphNode) : PolylineMapObject(
-    floatArrayOf(startNode.tileX * 16F, startNode.tileY * 16F,
-        endNode.tileX * 16F, endNode.tileY * 16F)
+    floatArrayOf(startNode.tileX * 16F + 16 / 2, startNode.tileY * 16F + 16 / 2,
+        endNode.tileX * 16F + 16 / 2, endNode.tileY * 16F + 16 / 2)
 ),
     Connection<GraphNode> {
 
@@ -17,10 +17,5 @@ class GraphConnection(val startNode: GraphNode, val endNode: GraphNode) : Polyli
     override fun getFromNode() = startNode
 
     override fun getToNode() = endNode
-
-    fun render(shapeRenderer: ShapeRenderer, color: Color) {
-        shapeRenderer.color = color
-        shapeRenderer.polyline(polyline.transformedVertices)
-    }
 
 }

@@ -54,7 +54,7 @@ class GameScreen(private val game: Main) : Screen {
             ::mapToTileCoordinate, game::toMenuScreen))
     }
 
-    private val pathRenderer = PathRenderer(this, camera,
+    private val pathRenderer = PathRenderer(camera,
         level.collisionLayer, level.objectLayer, tileSet.getTile(95))
 
     private lateinit var playerSprite: Sprite

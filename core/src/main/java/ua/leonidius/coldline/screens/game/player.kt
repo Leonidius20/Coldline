@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Sprite
 import ua.leonidius.coldline.entity.components.*
 
-fun GameScreen.createPlayer(tileX: Int, tileY: Int): Entity {
+fun GameScreen.createPlayer(mapX: Float, mapY: Float): Entity {
     with(engine) {
         createEntity().run {
             /*add(createComponent(PositionComponent::class.java).apply {
@@ -18,8 +18,8 @@ fun GameScreen.createPlayer(tileX: Int, tileY: Int): Entity {
 
             add(createComponent(SpriteComponent::class.java).apply {
                 sprite = Sprite(Texture("player.png")).apply {
-                    x = tileToMapCoordinate(tileX)
-                    y = tileToMapCoordinate(tileY)
+                    x = mapX
+                    y = mapY
                 }
             })
 

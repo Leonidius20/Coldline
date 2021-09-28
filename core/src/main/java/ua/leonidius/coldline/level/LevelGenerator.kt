@@ -1,6 +1,7 @@
 package ua.leonidius.coldline.level
 
 import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
@@ -64,6 +65,8 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         placeWalls()
 
         placeDoor()
+
+        placeSpawnPoint()
 
         map.layers.add(collisionLayer)
         map.layers.add(objectLayer)
@@ -130,16 +133,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     private fun placeDoor() {
         for (y in height - 2 downTo 1) {
             for (x in 1 until width - 2) {
-                if (collisionLayer.getCell(x, y).tile == floorTile // if there is a 3x3 empty space
-                    && collisionLayer.getCell(x, y + 1).tile == floorTile
-                    && collisionLayer.getCell(x, y - 1).tile == floorTile
-                    && collisionLayer.getCell(x + 1, y).tile == floorTile
-                    && collisionLayer.getCell(x - 1, y).tile == floorTile
-                    && collisionLayer.getCell(x - 1, y - 1).tile == floorTile
-                    && collisionLayer.getCell(x - 1, y + 1).tile == floorTile
-                    && collisionLayer.getCell(x + 1, y - 1).tile == floorTile
-                    && collisionLayer.getCell(x + 1, y + 1).tile == floorTile
-                ) {
+                if (is3x3RadiusEmpty(x, y)) {
                     objectLayer.objects.add(TiledMapTileMapObject(doorTile, false, false).apply {
                         name = "door"
                         this.x = (x * tileWidth).toFloat()
@@ -149,6 +143,40 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
                 }
             }
         }
+    }
+
+    private fun placeSpawnPoint() {
+        for (y in 1 until height - 2) {
+            for (x in width - 2 downTo 1) {
+                if (is3x3RadiusEmpty(x, y)) {
+                    objectLayer.objects.add(RectangleMapObject().apply {
+                        name = "spawnPoint"
+                        this.rectangle.x = (x * tileWidth).toFloat()
+                        this.rectangle.y = (y * tileHeight).toFloat()
+                    })
+                    return
+                }
+            }
+        }
+    }
+
+    /**
+     * Checking if a 3x3 rectangle with the center at supplied coordinates
+     * only contains floor tiles, i.e. is fully inside a room. Does not
+     * check if the coordinate range is correct
+     * @throws IndexOutOfBoundsException if the 3x3 rectangle goes beyond the map
+     */
+    private fun is3x3RadiusEmpty(x: Int, y: Int): Boolean {
+        return collisionLayer.getCell(x, y).tile == floorTile
+            && collisionLayer.getCell(x, y + 1).tile == floorTile
+            && collisionLayer.getCell(x, y - 1).tile == floorTile
+            && collisionLayer.getCell(x + 1, y).tile == floorTile
+            && collisionLayer.getCell(x - 1, y).tile == floorTile
+            && collisionLayer.getCell(x - 1, y - 1).tile == floorTile
+            && collisionLayer.getCell(x - 1, y + 1).tile == floorTile
+            && collisionLayer.getCell(x + 1, y - 1).tile == floorTile
+            && collisionLayer.getCell(x + 1, y + 1).tile == floorTile
+
     }
 
 }

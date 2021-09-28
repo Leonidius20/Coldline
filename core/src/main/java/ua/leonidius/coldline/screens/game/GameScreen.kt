@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
@@ -66,8 +67,10 @@ class GameScreen(private val game: Main) : Screen {
         createEnemy(16, 45)
         createEnemy(27, 45)
 
-        val player = createPlayer(45, 6)
-        playerSprite = player.getComponent(SpriteComponent::class.java).sprite
+        with (level.objectLayer.objects.get("spawnPoint") as RectangleMapObject) {
+            val player = createPlayer(rectangle.x, rectangle.y)
+            playerSprite = player.getComponent(SpriteComponent::class.java).sprite
+        }
 
         createDoor(exitTileX, exitTileX) // TODO: make these coords work
     }

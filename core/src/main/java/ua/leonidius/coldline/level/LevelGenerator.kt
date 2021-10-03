@@ -1,12 +1,12 @@
 package ua.leonidius.coldline.level
 
 import com.badlogic.gdx.maps.MapLayer
-import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.github.czyzby.noise4j.map.Grid
 import com.github.czyzby.noise4j.map.generator.room.dungeon.DungeonGenerator
@@ -26,6 +26,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     private val verticalWallTileLeft = tileSet.getTile(17)
     private val floorTile = tileSet.getTile(95)
     private var doorTile = tileSet.getTile(32)
+    private var chestTile = tileSet.getTile(65)
 
     private lateinit var collisionLayer: TiledMapTileLayer
     private lateinit var objectLayer: MapLayer
@@ -70,6 +71,8 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         placeDoor()
 
         placeSpawnPoint()
+
+        placeChests()
 
         map.layers.add(collisionLayer)
         map.layers.add(objectLayer)
@@ -182,6 +185,20 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
             && collisionLayer.getCell(x + 1, y - 1).tile == floorTile
             && collisionLayer.getCell(x + 1, y + 1).tile == floorTile
 
+    }
+
+    private fun placeChests() {
+        repeat(11) {
+            val x = MathUtils.random(1, width - 1)
+            val y = MathUtils.random(1, height - 1)
+            if (collisionLayer.getCell(x, y).tile == floorTile) {
+                objectLayer.objects.add(TiledMapTileMapObject(chestTile, false, false).apply {
+                    this.x = (x * tileWidth).toFloat()
+                    this.y = (y * tileHeight).toFloat()
+                    this.properties.put("tag", "chest")
+                })
+            }
+        }
     }
 
 }

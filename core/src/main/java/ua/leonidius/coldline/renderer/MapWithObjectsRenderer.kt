@@ -2,7 +2,6 @@ package ua.leonidius.coldline.renderer
 
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.TextureMapObject
-import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import ua.leonidius.coldline.level.Level
 

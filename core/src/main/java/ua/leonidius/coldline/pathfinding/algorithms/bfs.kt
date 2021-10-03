@@ -7,12 +7,12 @@ import ua.leonidius.coldline.pathfinding.GraphNode
 
 fun bfs(
     graph: Graph, startNode: GraphNode, endNode: GraphNode
-): DefaultGraphPath<GraphNode>? {
+): List<GraphNode>? {
 
     val discoveredNode = graph.nodes.associateWith { false }.toMutableMap()
 
-    val queue = ArrayDeque<Array<GraphNode>>()
-    queue.addLast(Array(arrayOf(startNode)))
+    val queue = ArrayDeque<List<GraphNode>>()
+    queue.addLast(arrayListOf(startNode))
 
     while (!queue.isEmpty()) {
         val path = queue.first()
@@ -20,10 +20,10 @@ fun bfs(
 
         for (adjacentNode in graph.getAdjacentNodes(node)) {
             if (!discoveredNode[adjacentNode]!!) {
-                val newPath = Array(path).apply { add(adjacentNode) }
+                val newPath = ArrayList(path).apply { add(adjacentNode) }
                 queue.addLast(newPath)
 
-                if (adjacentNode == endNode) return DefaultGraphPath(newPath)
+                if (adjacentNode == endNode) return newPath
 
                 discoveredNode[adjacentNode] = true
             }

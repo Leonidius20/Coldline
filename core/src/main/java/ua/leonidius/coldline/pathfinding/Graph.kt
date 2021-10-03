@@ -113,4 +113,8 @@ class Graph(collisionLayer: TiledMapTileLayer, objectLayer: MapLayer, floorTile:
             if (it.fromNode == node) it.toNode else it.fromNode
         }*/ adjacencyLists[node]!!
 
+    fun getEdgeWeight(start: GraphNode, end: GraphNode): Int {
+        return 1 // they are all 1, but todo
+    }
+
 }

@@ -1,14 +1,12 @@
 package ua.leonidius.coldline.pathfinding.algorithms
 
-import com.badlogic.gdx.ai.pfa.DefaultGraphPath
-import com.badlogic.gdx.utils.Array
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
 import java.util.*
 
 fun uniformCostSearch(
     graph: Graph, startNode: GraphNode, endNode: GraphNode
-): DefaultGraphPath<GraphNode> {
+): List<GraphNode> {
 
     val costs = graph.nodes.associateWith { Double.POSITIVE_INFINITY }.toMutableMap()
     val paths = graph.nodes.associateWith { emptyList<GraphNode>() }.toMutableMap()
@@ -37,5 +35,5 @@ fun uniformCostSearch(
         }
     }
 
-    return DefaultGraphPath(Array(paths[endNode]!!.toTypedArray()))
+    return paths[endNode]!!
 }

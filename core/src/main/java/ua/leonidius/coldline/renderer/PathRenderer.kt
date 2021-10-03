@@ -1,7 +1,6 @@
 package ua.leonidius.coldline.renderer
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.ai.pfa.GraphPath
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -9,14 +8,10 @@ import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
-import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
-import ua.leonidius.coldline.pathfinding.algorithms.bfs
-import ua.leonidius.coldline.pathfinding.algorithms.dfs
-import ua.leonidius.coldline.pathfinding.algorithms.uniformCostSearch
-import ua.leonidius.coldline.screens.game.GameScreen
-import java.math.BigInteger
+import ua.leonidius.coldline.pathfinding.algorithms.*
+import ua.leonidius.coldline.timing.measureTime
 
 class PathRenderer(private val camera: OrthographicCamera,
                    collisionLayer: TiledMapTileLayer,
@@ -26,7 +21,8 @@ class PathRenderer(private val camera: OrthographicCamera,
         NONE(0, Color.CLEAR),
         BFS(1, Color.YELLOW),
         DFS(2, Color.RED),
-        UCS(3, Color.GREEN)
+        UCS(3, Color.GREEN),
+        A_STAR_DIST(4, Color.TEAL),
     }
 
     private val shapeRenderer = ShapeRenderer()
@@ -35,7 +31,7 @@ class PathRenderer(private val camera: OrthographicCamera,
 
     private var currentPathAlgorithm = PathAlgorithmTypes.NONE
 
-    private lateinit var path: GraphPath<GraphNode>
+    private lateinit var path: List<GraphNode>
 
     var lastUsedAlgorithm = ""
     var lastComputeTime = -1.0
@@ -67,30 +63,34 @@ class PathRenderer(private val camera: OrthographicCamera,
             val nodeStart = graph.startNode
             val nodeEnd = graph.endNode
 
-            var timeBefore = BigInteger.ZERO
-            var timeAfter = BigInteger.ZERO
+            var timeElapsed = -1.0
 
             when(newPathAlgorithm) {
                 PathAlgorithmTypes.DFS -> {
-                    timeBefore = TimeUtils.nanoTime().toBigInteger()
-                    path = dfs(graph, nodeStart, nodeEnd)!!
-                    timeAfter = TimeUtils.nanoTime().toBigInteger()
+                    timeElapsed = measureTime {
+                        dfs(graph, nodeStart, nodeEnd)!!
+                    }
                 }
                 PathAlgorithmTypes.BFS -> {
-                    timeBefore = TimeUtils.nanoTime().toBigInteger()
-                    path = bfs(graph, nodeStart, nodeEnd)!!
-                    timeAfter = TimeUtils.nanoTime().toBigInteger()
+                    timeElapsed = measureTime {
+                        path = bfs(graph, nodeStart, nodeEnd)!!
+                    }
                 }
                 PathAlgorithmTypes.UCS -> {
-                    timeBefore = TimeUtils.nanoTime().toBigInteger()
-                    path = uniformCostSearch(graph, nodeStart, nodeEnd)
-                    timeAfter = TimeUtils.nanoTime().toBigInteger()
+                    timeElapsed = measureTime {
+                        path = uniformCostSearch(graph, nodeStart, nodeEnd)
+                    }
+                }
+                PathAlgorithmTypes.A_STAR_DIST -> {
+                    timeElapsed = measureTime {
+                        path = aStar(graph, nodeStart, nodeEnd, ::distanceHeuristic)
+                    }
                 }
                 else -> {
                     path = dfs(graph, nodeStart, nodeEnd)!!
                 }
             }
-            val timeElapsed = (timeAfter - timeBefore).toDouble() / 1000000.0
+
             lastUsedAlgorithm = newPathAlgorithm.name
             lastComputeTime = timeElapsed
         } else {

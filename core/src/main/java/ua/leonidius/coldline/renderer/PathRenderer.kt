@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
 import ua.leonidius.coldline.pathfinding.GraphNode
 import ua.leonidius.coldline.pathfinding.algorithms.*
+import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.aStarWithChests
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithChests
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithTiles
 import ua.leonidius.coldline.timing.measureTime
@@ -24,6 +25,7 @@ class PathRenderer(private val camera: OrthographicCamera,
         DFS(2, Color.RED),
         UCS(3, Color.GREEN),
         A_STAR_DIST(4, Color.TEAL),
+        A_STAR_WITH_CHESTS(5, Color.BROWN),
     }
 
     private val shapeRenderer = ShapeRenderer()
@@ -93,6 +95,11 @@ class PathRenderer(private val camera: OrthographicCamera,
                 PathAlgorithmTypes.A_STAR_DIST -> {
                     timeElapsed = measureTime {
                         path = aStar(graph, nodeStart, nodeEnd, ::distanceHeuristic)
+                    }
+                }
+                PathAlgorithmTypes.A_STAR_WITH_CHESTS -> {
+                    timeElapsed = measureTime {
+                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::distanceHeuristic)
                     }
                 }
                 else -> {

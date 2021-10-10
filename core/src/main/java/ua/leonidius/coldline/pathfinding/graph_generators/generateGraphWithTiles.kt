@@ -1,0 +1,76 @@
+package ua.leonidius.coldline.pathfinding.graph_generators
+
+import com.badlogic.gdx.maps.MapLayer
+import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.maps.tiled.TiledMapTile
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
+import ua.leonidius.coldline.pathfinding.Graph
+import ua.leonidius.coldline.pathfinding.GraphNode
+
+/**
+ * Used to generate a graph with all floor tiles as nodes
+ * @return Triple of graph, start node (spawn) and end node (door)
+ */
+fun generateGraphWithTiles(collisionLayer: TiledMapTileLayer, objectLayer: MapLayer, floorTile: TiledMapTile): Triple<Graph, GraphNode, GraphNode> {
+    val graph = Graph()
+
+    val door = objectLayer.objects.get("door") as TiledMapTileMapObject
+    val spawn = objectLayer.objects.get("spawnPoint") as RectangleMapObject
+
+    lateinit var startNode: GraphNode
+    lateinit var endNode: GraphNode
+
+    with(collisionLayer) {
+        // adding nodes
+        var counter = 0
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                if (getCell(x, y).tile == floorTile) {
+
+                    val node = GraphNode(counter++, x, y)
+                    graph.addNode(node)
+
+                    if (door.x.toInt() / 16 == x && door.y.toInt() / 16 == y) {
+                        endNode = node
+                    }
+
+                    // TODO: remove magic 16 number
+                    if (spawn.rectangle.x.toInt() / 16 == x && spawn.rectangle.y.toInt() / 16 == y) {
+                        startNode = node
+                    }
+                }
+            }
+        }
+
+        // adding connections
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                val node = graph.findNode { it.tileX == x && it.tileY == y }
+                if (node != null) {
+                    val downLeftNode = graph.findNode { it.tileX == x - 1 && it.tileY == y - 1 }
+                    if (downLeftNode != null)
+                        graph.addConnection(node, downLeftNode)
+
+                    val downNode = graph.findNode { it.tileX == x && it.tileY == y - 1 }
+                    if (downNode != null)
+                        graph.addConnection(node, downNode)
+
+                    val downRightNode = graph.findNode { it.tileX == x + 1 && it.tileY == y - 1 }
+                    if (downRightNode != null)
+                        graph.addConnection(node, downRightNode)
+
+                    val rightNode = graph.findNode { it.tileX == x + 1 && it.tileY == y }
+                    if (rightNode != null)
+                        graph.addConnection(node, rightNode)
+
+                }
+            }
+        }
+    }
+
+
+    graph.generateAdjacencyLists()
+
+    return Triple(graph, startNode, endNode)
+}

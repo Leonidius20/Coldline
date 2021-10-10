@@ -8,9 +8,10 @@ import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
-import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
 import ua.leonidius.coldline.pathfinding.algorithms.*
+import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithChests
+import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithTiles
 import ua.leonidius.coldline.timing.measureTime
 
 class PathRenderer(private val camera: OrthographicCamera,
@@ -27,7 +28,15 @@ class PathRenderer(private val camera: OrthographicCamera,
 
     private val shapeRenderer = ShapeRenderer()
 
-    val graph = Graph(collisionLayer, objectLayer, floorTile)
+    private val _trio = generateGraphWithTiles(collisionLayer, objectLayer, floorTile)
+    val graph = _trio.first
+    private val startNode = _trio.second
+    private val endNode = _trio.third
+
+    private val _chestTriple = generateGraphWithChests(objectLayer)
+    private val chestGraph = _chestTriple.first
+    private val chestGraphStart = _chestTriple.second
+    private val chestGraphEnd = _chestTriple.third
 
     private var currentPathAlgorithm = PathAlgorithmTypes.NONE
 
@@ -60,15 +69,15 @@ class PathRenderer(private val camera: OrthographicCamera,
         val newPathAlgorithm =  PathAlgorithmTypes.values()[(currentPathAlgorithm.id + 1) % PathAlgorithmTypes.values().size]
 
         if (newPathAlgorithm != PathAlgorithmTypes.NONE) {
-            val nodeStart = graph.startNode
-            val nodeEnd = graph.endNode
+            val nodeStart = startNode
+            val nodeEnd = endNode
 
             var timeElapsed = -1.0
 
             when(newPathAlgorithm) {
                 PathAlgorithmTypes.DFS -> {
                     timeElapsed = measureTime {
-                        dfs(graph, nodeStart, nodeEnd)!!
+                        path = dfs(graph, nodeStart, nodeEnd)!!
                     }
                 }
                 PathAlgorithmTypes.BFS -> {

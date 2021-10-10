@@ -27,16 +27,18 @@ fun generateGraphWithTiles(collisionLayer: TiledMapTileLayer, objectLayer: MapLa
         for (x in 0 until width) {
             for (y in 0 until height) {
                 if (getCell(x, y).tile == floorTile) {
+                    // TODO: remove magic 16 number
+                    val mapX = x * 16F
+                    val mapY = y * 16F
 
-                    val node = GraphNode(counter++, x, y)
+                    val node = GraphNode(counter++, mapX, mapY)
                     graph.addNode(node)
 
-                    if (door.x.toInt() / 16 == x && door.y.toInt() / 16 == y) {
+                    if (door.x == mapX && door.y == mapY) {
                         endNode = node
                     }
 
-                    // TODO: remove magic 16 number
-                    if (spawn.rectangle.x.toInt() / 16 == x && spawn.rectangle.y.toInt() / 16 == y) {
+                    if (spawn.rectangle.x == mapX && spawn.rectangle.y == mapY) {
                         startNode = node
                     }
                 }

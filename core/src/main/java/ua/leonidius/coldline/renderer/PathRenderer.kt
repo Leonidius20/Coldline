@@ -53,9 +53,9 @@ class PathRenderer(private val camera: OrthographicCamera,
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
 
             val allVertices = mutableListOf<Float>()
-            path.forEachIndexed { index, graphNodeObject ->
-                allVertices.add(graphNodeObject.tileX * 16F + 16 / 2)
-                allVertices.add(graphNodeObject.tileY * 16F + 16 / 2)
+            path.forEach { node ->
+                allVertices.add(node.mapX + 16 / 2) // adding 16 / 2 to center it in a cell
+                allVertices.add(node.mapY + 16 / 2)
             }
             val pathPolyline = Polyline(allVertices.toFloatArray())
             shapeRenderer.color = currentPathAlgorithm.color

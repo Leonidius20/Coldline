@@ -58,7 +58,7 @@ class Graph {
         }*/ adjacencyLists[node]!!
 
     fun getEdgeWeight(start: GraphNode, end: GraphNode): Float {
-        return getConnectionBetween(start, end)!!.getWeight()
+        return getConnectionBetween(start, end)!!.weight
     }
 
 }

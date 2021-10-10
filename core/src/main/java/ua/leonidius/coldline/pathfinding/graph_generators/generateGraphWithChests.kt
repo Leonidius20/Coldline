@@ -19,16 +19,16 @@ fun generateGraphWithChests(objectLayer: MapLayer): Triple<Graph, GraphNode, Gra
     var nodeIndex = 0
 
     val door = objectLayer.objects.get("door") as TiledMapTileMapObject
-    val doorNode = GraphNode(nodeIndex++, door.x.toInt() / 16, door.y.toInt() / 16)
+    val doorNode = GraphNode(nodeIndex++, door.x, door.y)
     graph.addNode(doorNode)
 
     val spawn = objectLayer.objects.get("spawnPoint") as RectangleMapObject
-    val spawnNode = GraphNode(nodeIndex++, spawn.rectangle.x.toInt() / 16, spawn.rectangle.y.toInt() / 16)
+    val spawnNode = GraphNode(nodeIndex++, spawn.rectangle.x, spawn.rectangle.y)
     graph.addNode(spawnNode)
 
     val chests = objectLayer.objects.filter { it.properties["tag"] == "chest" }.map { it as TiledMapTileMapObject }
     chests.forEach {
-        val chestNode = GraphNode(nodeIndex++, it.x.toInt() / 16, it.y.toInt() / 16)
+        val chestNode = GraphNode(nodeIndex++, it.x, it.y)
         graph.addNode(chestNode)
     }
 

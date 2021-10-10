@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2
 data class GraphConnection(
     val fromNode: GraphNode,
     val toNode: GraphNode,
-    val weight: Float, val cost: Float = Vector2.dst(
+    val weight: Float = Vector2.dst(
         fromNode.mapX, fromNode.mapY,
         toNode.mapX, toNode.mapY
     )

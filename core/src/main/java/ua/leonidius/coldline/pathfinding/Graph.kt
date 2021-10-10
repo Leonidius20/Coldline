@@ -11,7 +11,11 @@ class Graph {
         nodes.add(node)
     }
 
-    fun addConnection(from: GraphNode, to: GraphNode, weight: Float = 1F) {
+    fun addConnection(from: GraphNode, to: GraphNode) {
+        connections.add(GraphConnection(from, to))
+    }
+
+    fun addConnection(from: GraphNode, to: GraphNode, weight: Float) {
         connections.add(GraphConnection(from, to, weight))
     }
 

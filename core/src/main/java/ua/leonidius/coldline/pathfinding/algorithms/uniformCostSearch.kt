@@ -23,7 +23,7 @@ fun uniformCostSearch(
 
         for (adjacentNode in graph.getAdjacentNodes(node)) {
             val adjacentNodeCost = costs[adjacentNode]!!
-            val costThroughThisNode = cost + graph.getConnectionBetween(node, adjacentNode)!!.cost
+            val costThroughThisNode = cost + graph.getConnectionBetween(node, adjacentNode)!!.weight
             if (adjacentNodeCost > costThroughThisNode) {
                 costs[adjacentNode] = costThroughThisNode
                 paths[adjacentNode] = mutableListOf<GraphNode>().apply {

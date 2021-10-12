@@ -19,8 +19,6 @@ fun nearestNeighborTsp(graph: Graph, startNode: GraphNode, endNode: GraphNode): 
     }
 
     val result = runAlgo(graph, startNode)
-    result.remove(fictitiousNode)
-    val endResult = result.distinct()
 
     with(graph) {
         nodes.remove(fictitiousNode)
@@ -31,7 +29,7 @@ fun nearestNeighborTsp(graph: Graph, startNode: GraphNode, endNode: GraphNode): 
         generateAdjacencyLists()
     }
 
-    return endResult
+    return result
 }
 
 private fun runAlgo(graph: Graph, startNode: GraphNode): MutableList<GraphNode> {
@@ -50,6 +48,10 @@ private fun runAlgo(graph: Graph, startNode: GraphNode): MutableList<GraphNode> 
         visited[nextNode.index] = true
         currentVertex = nextNode
     }
+
+    val start = path.removeFirst()
+    path.removeFirst() // removing the fictitious node
+    path.add(start) // putting start node at the end so that we end up with DOOR -> chest(0..*) -> START
 
     return path
 }

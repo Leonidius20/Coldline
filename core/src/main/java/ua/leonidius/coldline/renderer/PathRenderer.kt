@@ -9,8 +9,10 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
 import ua.leonidius.coldline.pathfinding.GraphNode
-import ua.leonidius.coldline.pathfinding.algorithms.*
-import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.aStarWithChests
+import ua.leonidius.coldline.pathfinding.algorithms.aStar
+import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.nearestNeighborTsp
+import ua.leonidius.coldline.pathfinding.algorithms.dfs
+import ua.leonidius.coldline.pathfinding.algorithms.distanceHeuristic
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithChests
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithTiles
 import ua.leonidius.coldline.timing.measureTime
@@ -21,11 +23,11 @@ class PathRenderer(private val camera: OrthographicCamera,
 
     enum class PathAlgorithmTypes(val id: Int, val color: Color) {
         NONE(0, Color.CLEAR),
-        BFS(1, Color.YELLOW),
-        DFS(2, Color.RED),
-        UCS(3, Color.GREEN),
-        A_STAR_DIST(4, Color.TEAL),
-        A_STAR_WITH_CHESTS(5, Color.BROWN),
+        //BFS(1, Color.YELLOW),
+        //DFS(2, Color.RED),
+        //UCS(3, Color.GREEN),
+        A_STAR_DIST(1, Color.TEAL),
+        A_STAR_WITH_CHESTS(2, Color.BROWN),
     }
 
     private val shapeRenderer = ShapeRenderer()
@@ -77,7 +79,7 @@ class PathRenderer(private val camera: OrthographicCamera,
             var timeElapsed = -1.0
 
             when(newPathAlgorithm) {
-                PathAlgorithmTypes.DFS -> {
+                /*PathAlgorithmTypes.DFS -> {
                     timeElapsed = measureTime {
                         path = dfs(graph, nodeStart, nodeEnd)!!
                     }
@@ -91,7 +93,7 @@ class PathRenderer(private val camera: OrthographicCamera,
                     timeElapsed = measureTime {
                         path = uniformCostSearch(graph, nodeStart, nodeEnd)
                     }
-                }
+                }*/
                 PathAlgorithmTypes.A_STAR_DIST -> {
                     timeElapsed = measureTime {
                         path = aStar(graph, nodeStart, nodeEnd, ::distanceHeuristic)
@@ -99,7 +101,8 @@ class PathRenderer(private val camera: OrthographicCamera,
                 }
                 PathAlgorithmTypes.A_STAR_WITH_CHESTS -> {
                     timeElapsed = measureTime {
-                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::distanceHeuristic)
+                        // path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::distanceHeuristic)
+                        path = nearestNeighborTsp(chestGraph, chestGraphStart, chestGraphEnd)
                     }
                 }
                 else -> {

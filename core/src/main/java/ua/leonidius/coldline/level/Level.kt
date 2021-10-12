@@ -1,14 +1,10 @@
 package ua.leonidius.coldline.level
 
-import com.badlogic.gdx.maps.MapLayer
-import com.badlogic.gdx.maps.MapObject
-import com.badlogic.gdx.maps.objects.RectangleMapObject
-import com.badlogic.gdx.maps.tiled.*
+import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.Vector2
-import com.github.czyzby.noise4j.map.Grid
-import com.github.czyzby.noise4j.map.generator.room.dungeon.DungeonGenerator
-import ua.leonidius.coldline.pathfinding.Graph
 
 class Level(val map: TiledMap, val exitTileCoords: Vector2) {
 
@@ -17,6 +13,11 @@ class Level(val map: TiledMap, val exitTileCoords: Vector2) {
 
     fun dispose() {
         map.dispose()
+    }
+
+    fun isWallBetween(mapX1: Float, mapY1: Float, mapX2: Float, mapY2: Float) {
+        // TODO: go down the line in small steps (8px), calculate what tile there is and check
+        // if it is a wall
     }
 
     companion object {

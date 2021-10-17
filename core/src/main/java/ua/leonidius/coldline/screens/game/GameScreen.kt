@@ -43,6 +43,9 @@ class GameScreen(private val game: Main) : Screen {
     private var exitTileX = levelGenerator.doorTileX
     private var exitTileY = levelGenerator.doorTileY
 
+    val pathRenderer = PathRenderer(camera,
+        level.collisionLayer, level.objectLayer, tileSet.getTile(95))
+
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera,
             guiCamera, game.bitmapFont, ::mapToTileCoordinate))
@@ -52,10 +55,8 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(EntityCollisionSystem(
             { exitTileX }, { exitTileY },
             ::mapToTileCoordinate, game::toMenuScreen))
+        addSystem(PathHighlightingSystem(pathRenderer))
     }
-
-    private val pathRenderer = PathRenderer(camera,
-        level.collisionLayer, level.objectLayer, tileSet.getTile(95))
 
     private lateinit var playerSprite: Sprite
 
@@ -123,6 +124,10 @@ class GameScreen(private val game: Main) : Screen {
 
     fun switchPathAlgo() {
         pathRenderer.switchPathAlgorithm()
+    }
+
+    fun switchPathHighlightingMode() {
+        pathRenderer.displayWholePath = !pathRenderer.displayWholePath
     }
 
     private fun mapToTileCoordinate(coordinate: Float) =

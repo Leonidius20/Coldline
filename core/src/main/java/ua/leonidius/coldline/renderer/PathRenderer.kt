@@ -24,12 +24,13 @@ class PathRenderer(private val camera: OrthographicCamera,
         //BFS(1, Color.YELLOW),
         //DFS(2, Color.RED),
         //UCS(3, Color.GREEN),
-        A_STAR_EUCLIDIAN(1, Color.TEAL),
-        A_STAR_MANHATTAN(2, Color.RED),
-        A_STAR_GREEDY(3, Color.YELLOW),
-        A_STAR_WITH_CHESTS_EUCLIDIAN(4, Color.BROWN),
-        A_STAR_WITH_CHESTS_MANHATTAN(5, Color.BROWN),
-        A_STAR_WITH_CHESTS_GREEDY(6, Color.BROWN),
+        A_STAR_WITH_CHESTS_EUCLIDIAN(1, Color.BROWN),
+        A_STAR_WITH_CHESTS_MANHATTAN(2, Color.BROWN),
+        A_STAR_WITH_CHESTS_GREEDY(3, Color.BROWN),
+        A_STAR_EUCLIDIAN(4, Color.TEAL),
+        A_STAR_MANHATTAN(5, Color.RED),
+        A_STAR_GREEDY(6, Color.YELLOW),
+
     }
 
     private val shapeRenderer = ShapeRenderer()
@@ -46,7 +47,10 @@ class PathRenderer(private val camera: OrthographicCamera,
 
     private var currentPathAlgorithm = PathAlgorithmTypes.NONE
 
-    private lateinit var path: List<GraphNode>
+    var displayWholePath = true
+    var currentDestinationIndex = 1 // index of current node in path that is the destination
+
+    lateinit var path: List<GraphNode>
 
     var lastUsedAlgorithm = ""
     var lastComputeTime = -1.0
@@ -57,15 +61,31 @@ class PathRenderer(private val camera: OrthographicCamera,
             Gdx.gl.glLineWidth(10F)
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-
-            val allVertices = mutableListOf<Float>()
-            path.forEach { node ->
-                allVertices.add(node.mapX + 16 / 2) // adding 16 / 2 to center it in a cell
-                allVertices.add(node.mapY + 16 / 2)
-            }
-            val pathPolyline = Polyline(allVertices.toFloatArray())
             shapeRenderer.color = currentPathAlgorithm.color
-            shapeRenderer.polyline(pathPolyline.transformedVertices)
+
+            if (displayWholePath) {
+
+                var counter = 0
+
+                val allVertices = mutableListOf<Float>()
+                path.forEach { node ->
+                    allVertices.add(node.mapX + 16 / 2) // adding 16 / 2 to center it in a cell
+                    allVertices.add(node.mapY + 16 / 2 + counter++)
+                    if (counter == 7) counter = 0
+                }
+                val pathPolyline = Polyline(allVertices.toFloatArray())
+
+                shapeRenderer.polyline(pathPolyline.transformedVertices)
+            } else {
+                if (currentDestinationIndex != path.size) {
+                    val destination = path[currentDestinationIndex]
+                    val start = path[currentDestinationIndex - 1]
+                    val vertices = floatArrayOf(start.mapX + 16 / 2, start.mapY + 16 / 2,
+                        destination.mapX + 16 / 2, destination.mapY + 16 / 2)
+                    val pathPolyline = Polyline(vertices)
+                    shapeRenderer.polyline(pathPolyline.transformedVertices)
+                }
+            }
 
             shapeRenderer.end()
         }
@@ -134,6 +154,8 @@ class PathRenderer(private val camera: OrthographicCamera,
 
             lastUsedAlgorithm = newPathAlgorithm.name
             lastComputeTime = timeElapsed
+
+            currentDestinationIndex = 1
         } else {
             lastUsedAlgorithm = ""
         }

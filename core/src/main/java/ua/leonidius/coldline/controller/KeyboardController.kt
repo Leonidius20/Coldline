@@ -18,6 +18,8 @@ class KeyboardController(private val gameScreen: GameScreen): InputProcessor {
             Input.Keys.S -> down = true
             Input.Keys.D -> right = true
             Input.Keys.Z -> gameScreen.switchPathAlgo()
+            Input.Keys.H -> gameScreen.switchPathHighlightingMode()
+            Input.Keys.N -> gameScreen.pathRenderer.currentDestinationIndex++
         }
         return true
     }

@@ -16,7 +16,7 @@ fun aStarWithChests(chestGraph: Graph,
                     heuristic: (GraphNode, GraphNode) -> Float): List<GraphNode> {
     val path = mutableListOf<GraphNode>()
 
-    val chestPath = nearestNeighborTsp(chestGraph, chestStartNode, chestEndNode)
+    val chestPath = nearestNeighborTsp(chestGraph, chestStartNode, chestEndNode).reversed()
 
     var prevChestNode = chestPath.first()
     chestPath.forEachIndexed { index, chestNode ->
@@ -33,5 +33,5 @@ fun aStarWithChests(chestGraph: Graph,
         }
     }
 
-    return path.toList()
+    return path
 }

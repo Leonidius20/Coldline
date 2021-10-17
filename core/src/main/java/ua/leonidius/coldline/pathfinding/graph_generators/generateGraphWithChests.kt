@@ -5,6 +5,7 @@ import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
+import ua.leonidius.coldline.pathfinding.algorithms.manhattanHeuristic
 
 /**
  * Used to generate a graph with chests, spawn and door as nodes
@@ -36,7 +37,7 @@ fun generateGraphWithChests(objectLayer: MapLayer): Triple<Graph, GraphNode, Gra
     graph.nodes.forEachIndexed { index1, graphNode1 ->
         graph.nodes.forEachIndexed { index2, graphNode2 ->
             if (index2 > index1) {
-                graph.addConnection(graphNode1, graphNode2)
+                graph.addConnection(graphNode1, graphNode2, manhattanHeuristic(graphNode1, graphNode2))
             }
         }
     }

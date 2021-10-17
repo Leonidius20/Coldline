@@ -9,10 +9,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
 import ua.leonidius.coldline.pathfinding.GraphNode
-import ua.leonidius.coldline.pathfinding.algorithms.aStar
-import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.nearestNeighborTsp
-import ua.leonidius.coldline.pathfinding.algorithms.dfs
-import ua.leonidius.coldline.pathfinding.algorithms.distanceHeuristic
+import ua.leonidius.coldline.pathfinding.algorithms.*
+import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.aStarWithChests
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithChests
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithTiles
 import ua.leonidius.coldline.timing.measureTime
@@ -26,8 +24,12 @@ class PathRenderer(private val camera: OrthographicCamera,
         //BFS(1, Color.YELLOW),
         //DFS(2, Color.RED),
         //UCS(3, Color.GREEN),
-        A_STAR_DIST(1, Color.TEAL),
-        A_STAR_WITH_CHESTS(2, Color.BROWN),
+        A_STAR_EUCLIDIAN(1, Color.TEAL),
+        A_STAR_MANHATTAN(2, Color.RED),
+        A_STAR_GREEDY(3, Color.YELLOW),
+        A_STAR_WITH_CHESTS_EUCLIDIAN(4, Color.BROWN),
+        A_STAR_WITH_CHESTS_MANHATTAN(5, Color.BROWN),
+        A_STAR_WITH_CHESTS_GREEDY(6, Color.BROWN),
     }
 
     private val shapeRenderer = ShapeRenderer()
@@ -94,15 +96,35 @@ class PathRenderer(private val camera: OrthographicCamera,
                         path = uniformCostSearch(graph, nodeStart, nodeEnd)
                     }
                 }*/
-                PathAlgorithmTypes.A_STAR_DIST -> {
+                PathAlgorithmTypes.A_STAR_EUCLIDIAN -> {
                     timeElapsed = measureTime {
-                        path = aStar(graph, nodeStart, nodeEnd, ::distanceHeuristic)
+                        path = aStar(graph, nodeStart, nodeEnd, ::euclidianHeuristic)
                     }
                 }
-                PathAlgorithmTypes.A_STAR_WITH_CHESTS -> {
+                PathAlgorithmTypes.A_STAR_MANHATTAN -> {
                     timeElapsed = measureTime {
-                        // path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::distanceHeuristic)
-                        path = nearestNeighborTsp(chestGraph, chestGraphStart, chestGraphEnd)
+                        path = aStar(graph, nodeStart, nodeEnd, ::manhattanHeuristic)
+                    }
+                }
+                PathAlgorithmTypes.A_STAR_GREEDY -> {
+                    timeElapsed = measureTime {
+                        path = aStar(graph, nodeStart, nodeEnd, ::greedyHeuristic)
+                    }
+                }
+                PathAlgorithmTypes.A_STAR_WITH_CHESTS_EUCLIDIAN -> {
+                    timeElapsed = measureTime {
+                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::euclidianHeuristic)
+                        // path = nearestNeighborTsp(chestGraph, chestGraphStart, chestGraphEnd)
+                    }
+                }
+                PathAlgorithmTypes.A_STAR_WITH_CHESTS_MANHATTAN -> {
+                    timeElapsed = measureTime {
+                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::manhattanHeuristic)
+                    }
+                }
+                PathAlgorithmTypes.A_STAR_WITH_CHESTS_GREEDY -> {
+                    timeElapsed = measureTime {
+                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::greedyHeuristic)
                     }
                 }
                 else -> {

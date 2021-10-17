@@ -1,11 +1,10 @@
 package ua.leonidius.coldline.pathfinding.algorithms
 
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import ua.leonidius.coldline.pathfinding.Graph
 import ua.leonidius.coldline.pathfinding.GraphNode
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.math.abs
 
 fun aStar(graph: Graph,
           start: GraphNode,
@@ -56,6 +55,17 @@ fun aStar(graph: Graph,
     return path
 }
 
-fun distanceHeuristic(node1: GraphNode, node2: GraphNode): Float {
+fun euclidianHeuristic(node1: GraphNode, node2: GraphNode): Float {
     return Vector2.dst(node1.tileX.toFloat(), node1.tileY.toFloat(), node2.tileX.toFloat(), node2.tileY.toFloat())
 }
+
+fun manhattanHeuristic(node1: GraphNode, node2: GraphNode): Float {
+    val dx = abs(node1.tileX - node2.tileX)
+    val dy = abs(node1.tileY - node2.tileY)
+    return (dx + dy).toFloat()
+}
+
+/**
+ * A* becomes Dijkstra's
+ */
+fun greedyHeuristic(node1: GraphNode, node2: GraphNode): Float = 0F

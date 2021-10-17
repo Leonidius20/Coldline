@@ -42,7 +42,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
             maxRoomSize = 15 / 2
             tolerance = 6 / 2
             minRoomSize = 5 / 2 + 1
-            randomConnectorChance = 0F
+            randomConnectorChance = 0.4F
         }.generate(grid)
 
         val map = TiledMap()

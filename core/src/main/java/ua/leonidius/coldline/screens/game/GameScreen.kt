@@ -51,8 +51,8 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
         addSystem(WallCollisionSystem(level.collisionLayer))
-        addSystem(EntityCollisionSystem(
-            { exitTileX }, { exitTileY }, game::toMenuScreen))
+        addSystem(EntityCollisionSystem())
+        addSystem(DoorSystem(game::toMenuScreen))
         addSystem(PathHighlightingSystem(pathRenderer))
         addSystem(DeathSystem())
     }

@@ -5,5 +5,5 @@ import com.badlogic.gdx.math.Vector2
 
 data class MovementComponent(
     var velocity: Vector2 = Vector2(0F, 0F),
-    var speed: Float = 60 * 2F
+    var speed: Float = 6 * 2F
 ): Component

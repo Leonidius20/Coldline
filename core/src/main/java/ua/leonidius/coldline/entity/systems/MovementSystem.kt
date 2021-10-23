@@ -34,9 +34,9 @@ class MovementSystem: IteratingSystem(
 
         positionComponent.apply {
             if (!collisionComponent.collidesOnX)
-                mapX += (movementComponent.velocity.x * deltaTime)
+                mapX += (movementComponent.velocity.x * movementComponent.speed * deltaTime)
             if (!collisionComponent.collidesOnY)
-                mapY += (movementComponent.velocity.y * deltaTime)
+                mapY += (movementComponent.velocity.y * movementComponent.speed * deltaTime)
         }
     }
 

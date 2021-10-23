@@ -28,7 +28,7 @@ class EnemyCombatSystem(private val playerPos: PositionComponent): IteratingSyst
 
             // create bullet
 
-            movementComponent.velocity = playerVector.sub(enemyVector)
+            movementComponent.velocity = playerVector.sub(enemyVector).nor()
         } else {
             movementComponent.velocity.apply { x = 0F; y = 0F }
         }

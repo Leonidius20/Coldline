@@ -24,6 +24,12 @@ fun GameScreen.createEnemy(enemyTileX: Int, enemyTileY: Int, isEnemyDumb: Boolea
                 isDumb = isEnemyDumb
             })
 
+            add(createComponent(MovementComponent::class.java).apply {
+                speed /= 1.25F
+            })
+
+            add(createComponent(CollisionComponent::class.java))
+
             addEntity(this)
         }
     }

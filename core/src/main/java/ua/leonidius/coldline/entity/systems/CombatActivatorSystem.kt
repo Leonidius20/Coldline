@@ -21,8 +21,8 @@ class CombatActivatorSystem(private val playerPos: PositionComponent): Iterating
     }
 
     private fun isInVicinityOf(enemyPos: PositionComponent): Boolean {
-        return playerPos.tileX in (enemyPos.tileX - 3)..(enemyPos.tileX + 3)
-                && playerPos.tileY in (enemyPos.tileY - 3)..(enemyPos.tileY + 3)
+        return playerPos.tileX in (enemyPos.tileX - 5)..(enemyPos.tileX + 5)
+                && playerPos.tileY in (enemyPos.tileY - 5)..(enemyPos.tileY + 5)
     }
 
 }

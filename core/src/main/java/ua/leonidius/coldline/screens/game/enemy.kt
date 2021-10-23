@@ -30,6 +30,8 @@ fun GameScreen.createEnemy(enemyTileX: Int, enemyTileY: Int, isEnemyDumb: Boolea
 
             add(createComponent(CollisionComponent::class.java))
 
+            add(createComponent(HealthComponent::class.java))
+
             addEntity(this)
         }
     }

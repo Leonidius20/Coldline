@@ -26,6 +26,8 @@ fun GameScreen.createPlayer(playerMapX: Float, playerMapY: Float): Entity {
 
             add(createComponent(PlayerComponent::class.java))
 
+            add(createComponent(HealthComponent::class.java))
+
             addEntity(this)
 
             return this

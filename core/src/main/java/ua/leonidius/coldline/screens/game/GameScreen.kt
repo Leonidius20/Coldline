@@ -54,6 +54,7 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(EntityCollisionSystem(
             { exitTileX }, { exitTileY }, game::toMenuScreen))
         addSystem(PathHighlightingSystem(pathRenderer))
+        addSystem(DeathSystem())
     }
 
     private lateinit var playerPosition: PositionComponent

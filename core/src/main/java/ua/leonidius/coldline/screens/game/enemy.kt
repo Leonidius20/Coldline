@@ -1,32 +1,27 @@
 package ua.leonidius.coldline.screens.game
 
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
-import ua.leonidius.coldline.entity.components.EntityType
-import ua.leonidius.coldline.entity.components.SpriteComponent
-import ua.leonidius.coldline.entity.components.TypeComponent
+import ua.leonidius.coldline.entity.components.*
 
-fun GameScreen.createEnemy(tileX: Int, tileY: Int, isDumb: Boolean) {
+fun GameScreen.createEnemy(enemyTileX: Int, enemyTileY: Int, isEnemyDumb: Boolean) {
     with(engine) {
         createEntity().run {
-            /*add(createComponent(PositionComponent::class.java).apply {
-                position = Vector3(
-                    tileToMapCoordinate(tileX),
-                    tileToMapCoordinate(tileY),
-                    1F
-                )
-            })*/
+            add(createComponent(PositionComponent::class.java).apply {
+                tileX = enemyTileX
+                tileY = enemyTileY
+            })
 
-            add(createComponent(SpriteComponent::class.java).apply {
-                sprite = Sprite(Texture("enemy.png")).apply {
-                    x = tileToMapCoordinate(tileX)
-                    y = tileToMapCoordinate(tileY)
-                }
+            add(createComponent(TextureComponent::class.java).apply {
+                texture = Texture("enemy.png")
                 // TODO: dispose of the asset, maybe through asset manager
             })
 
             add(createComponent(TypeComponent::class.java).apply {
-                type = if (isDumb) EntityType.ENEMY_DUMB else EntityType.ENEMY_SMART
+                type = if (isEnemyDumb) EntityType.ENEMY_DUMB else EntityType.ENEMY_SMART
+            })
+
+            add(createComponent(EnemyComponent::class.java).apply {
+                isDumb = isEnemyDumb
             })
 
             addEntity(this)

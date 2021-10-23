@@ -6,27 +6,21 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import ua.leonidius.coldline.entity.components.EntityType
-import ua.leonidius.coldline.entity.components.PlayerComponent
-import ua.leonidius.coldline.entity.components.SpriteComponent
-import ua.leonidius.coldline.entity.components.TypeComponent
+import ua.leonidius.coldline.entity.components.*
 
 class RenderingSystem(
     private val batch: Batch,
     private val camera: OrthographicCamera,
-    private val guiCamera: OrthographicCamera,
-    private val bitmapFont: BitmapFont,
-    private val mapToTileCoordinate: (Float) -> Int
-) : IteratingSystem(Family.all(SpriteComponent::class.java).get(), 1) {
+) : IteratingSystem(Family.all(TextureComponent::class.java).get(), 1) {
 
     private val renderQueue = ArrayDeque<Entity>()
 
-    private val textureMapper = ComponentMapper.getFor(SpriteComponent::class.java)
+    private val textureMapper = ComponentMapper.getFor(TextureComponent::class.java)
     private val typeMapper = ComponentMapper.getFor(TypeComponent::class.java)
+    private val positionMapper = ComponentMapper.getFor(PositionComponent::class.java)
 
-    private var lastPlayerX: Int = -1
-    private var lastPlayerY: Int = -1
+    //private var lastPlayerX: Int = -1
+    //private var lastPlayerY: Int = -1
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
@@ -40,12 +34,13 @@ class RenderingSystem(
 
             for (entity in renderQueue) {
                 val textureComponent = textureMapper.get(entity)
-                textureComponent.sprite.draw(this)
+                val positionComponent = positionMapper.get(entity)
+                batch.draw(textureComponent.texture, positionComponent.mapX, positionComponent.mapY)
 
                 if (typeMapper.get(entity).type == EntityType.PLAYER) {
                     camera.position.apply {
-                        x = textureComponent.sprite.x
-                        y = textureComponent.sprite.y
+                        x = positionComponent.mapX
+                        y = positionComponent.mapY
                     }
                 }
             }
@@ -59,9 +54,9 @@ class RenderingSystem(
     override fun processEntity(entity: Entity, deltaTime: Float) {
         renderQueue.addLast(entity)
         if (entity.getComponent(PlayerComponent::class.java) != null) {
-            val sprite = entity.getComponent(SpriteComponent::class.java).sprite
-            lastPlayerX = mapToTileCoordinate(sprite.x)
-            lastPlayerY = mapToTileCoordinate(sprite.y)
+            val sprite = entity.getComponent(TextureComponent::class.java).texture
+            //lastPlayerX = mapToTileCoordinate(sprite.x)
+            //lastPlayerY = mapToTileCoordinate(sprite.y)
         }
     }
 

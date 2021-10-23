@@ -6,13 +6,12 @@ import com.badlogic.gdx.Screen
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
-import ua.leonidius.coldline.entity.components.SpriteComponent
+import ua.leonidius.coldline.entity.components.PositionComponent
 import ua.leonidius.coldline.entity.systems.*
 import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.level.LevelGenerator
@@ -35,7 +34,7 @@ class GameScreen(private val game: Main) : Screen {
 
     // TODO: create tile set loader
     private val tileSet = Level.load("maps/level2.tmx").map.tileSets.getTileSet(0)
-    val levelGenerator = LevelGenerator(tileSet)
+    private val levelGenerator = LevelGenerator(tileSet)
     val level = levelGenerator.generate()
     private val renderer = MapWithObjectsRenderer(level, 1F)
 
@@ -48,33 +47,33 @@ class GameScreen(private val game: Main) : Screen {
         level.collisionLayer, level.objectLayer, tileSet.getTile(95))
 
     val engine = PooledEngine().apply {
-        addSystem(RenderingSystem(renderer.batch, camera,
-            guiCamera, game.bitmapFont, ::mapToTileCoordinate))
+        addSystem(RenderingSystem(renderer.batch, camera))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
         addSystem(WallCollisionSystem(level.collisionLayer))
         addSystem(EntityCollisionSystem(
-            { exitTileX }, { exitTileY },
-            ::mapToTileCoordinate, game::toMenuScreen))
+            { exitTileX }, { exitTileY }, game::toMenuScreen))
         addSystem(PathHighlightingSystem(pathRenderer))
     }
 
-    private lateinit var playerSprite: Sprite
+    private lateinit var playerPosition: PositionComponent
 
     override fun show() {
         Gdx.input.inputProcessor = keyboardController
 
         with (level.objectLayer.objects.get("spawnPoint") as RectangleMapObject) {
             val player = createPlayer(rectangle.x, rectangle.y)
-            playerSprite = player.getComponent(SpriteComponent::class.java).sprite
+            playerPosition = player.getComponent(PositionComponent::class.java)
         }
 
         createDoor(exitTileX, exitTileX)
 
+        engine.addSystem(CombatActivatorSystem(playerPosition))
+
         addEnemies()
     }
 
-    fun addEnemies() {
+    private fun addEnemies() {
         repeat(5) {
             val x = MathUtils.random(1, levelGenerator.width - 1)
             val y = MathUtils.random(1, levelGenerator.height - 1)
@@ -132,7 +131,6 @@ class GameScreen(private val game: Main) : Screen {
     override fun dispose() {
         level.dispose()
         renderer.dispose()
-        playerSprite.texture.dispose()
     }
 
     fun switchPathAlgo() {
@@ -148,14 +146,6 @@ class GameScreen(private val game: Main) : Screen {
 
     fun tileToMapCoordinate(coordinate: Int) =
         (coordinate * level.collisionLayer.tileWidth).toFloat()
-
-    fun getPlayerX() = playerSprite.x
-
-    fun getPlayerY() = playerSprite.y
-
-    fun getPlayerTileX() = mapToTileCoordinate(getPlayerX())
-
-    fun getPlayerTileY() = mapToTileCoordinate(getPlayerY())
 
     private fun printDebugData(batch: Batch) {
         printPathComputeTime(batch)
@@ -186,7 +176,7 @@ class GameScreen(private val game: Main) : Screen {
     private fun printPlayerLocation(batch: Batch) {
         game.bitmapFont.draw(
             batch,
-            "x = ${getPlayerTileX()}, y = ${getPlayerTileY()}",
+            "x = ${playerPosition.tileX}, y = ${playerPosition.tileY}",
             0F, 50F
         )
 

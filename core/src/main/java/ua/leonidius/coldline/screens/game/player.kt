@@ -2,25 +2,18 @@ package ua.leonidius.coldline.screens.game
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
 import ua.leonidius.coldline.entity.components.*
 
-fun GameScreen.createPlayer(mapX: Float, mapY: Float): Entity {
+fun GameScreen.createPlayer(playerMapX: Float, playerMapY: Float): Entity {
     with(engine) {
         createEntity().run {
-            /*add(createComponent(PositionComponent::class.java).apply {
-                position = Vector3(
-                    tileToMapCoordinate(tileX),
-                    tileToMapCoordinate(tileY),
-                    2F
-                )
-            })*/
+            add(createComponent(PositionComponent::class.java).apply {
+                mapX = playerMapX
+                mapY = playerMapY
+            })
 
-            add(createComponent(SpriteComponent::class.java).apply {
-                sprite = Sprite(Texture("player.png")).apply {
-                    x = mapX
-                    y = mapY
-                }
+            add(createComponent(TextureComponent::class.java).apply {
+                texture = Texture("player.png")
             })
 
             add(createComponent(TypeComponent::class.java).apply {

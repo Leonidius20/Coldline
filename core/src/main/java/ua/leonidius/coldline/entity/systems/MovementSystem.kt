@@ -6,36 +6,37 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import ua.leonidius.coldline.entity.components.CollisionComponent
 import ua.leonidius.coldline.entity.components.MovementComponent
-import ua.leonidius.coldline.entity.components.SpriteComponent
+import ua.leonidius.coldline.entity.components.PositionComponent
+import ua.leonidius.coldline.entity.components.TextureComponent
 
 /**
  * System to move entities that have collision
  */
 class MovementSystem: IteratingSystem(
     Family.all(MovementComponent::class.java,
-        SpriteComponent::class.java,
+        TextureComponent::class.java,
         CollisionComponent::class.java).get(), 3
 ) {
 
-    private val movementMapper: ComponentMapper<MovementComponent>
+    private val movementMapper
         = ComponentMapper.getFor(MovementComponent::class.java)
 
-    private val spriteMapper: ComponentMapper<SpriteComponent>
-        = ComponentMapper.getFor(SpriteComponent::class.java)
+    private val positionMapper
+        = ComponentMapper.getFor(PositionComponent::class.java)
 
     private val collisionMapper: ComponentMapper<CollisionComponent>
             = ComponentMapper.getFor(CollisionComponent::class.java)
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val movementComponent = movementMapper.get(entity)
-        val spriteComponent = spriteMapper.get(entity)
+        val positionComponent = positionMapper.get(entity)
         val collisionComponent = collisionMapper.get(entity)
 
-        spriteComponent.sprite.apply {
+        positionComponent.apply {
             if (!collisionComponent.collidesOnX)
-                x += (movementComponent.velocity.x * deltaTime)
+                mapX += (movementComponent.velocity.x * deltaTime)
             if (!collisionComponent.collidesOnY)
-                y += (movementComponent.velocity.y * deltaTime)
+                mapY += (movementComponent.velocity.y * deltaTime)
         }
     }
 

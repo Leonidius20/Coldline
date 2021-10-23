@@ -7,47 +7,47 @@ import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import ua.leonidius.coldline.entity.components.CollisionComponent
 import ua.leonidius.coldline.entity.components.MovementComponent
-import ua.leonidius.coldline.entity.components.SpriteComponent
+import ua.leonidius.coldline.entity.components.PositionComponent
+import ua.leonidius.coldline.entity.components.TextureComponent
 
 class WallCollisionSystem(private val collisionLayer: TiledMapTileLayer): IteratingSystem(
     Family.all(MovementComponent::class.java, CollisionComponent::class.java).get(), 2) {
 
-    private val spriteMapper: ComponentMapper<SpriteComponent>
-            = ComponentMapper.getFor(SpriteComponent::class.java)
-
-    private val collisionMapper: ComponentMapper<CollisionComponent>
-            = ComponentMapper.getFor(CollisionComponent::class.java)
-
-    private val movementMapper: ComponentMapper<MovementComponent>
-            = ComponentMapper.getFor(MovementComponent::class.java)
+    private val positionMapper = ComponentMapper.getFor(PositionComponent::class.java)
+    private val collisionMapper = ComponentMapper.getFor(CollisionComponent::class.java)
+    private val movementMapper = ComponentMapper.getFor(MovementComponent::class.java)
+    private val textureMapper = ComponentMapper.getFor(TextureComponent::class.java)
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val spriteComponent = spriteMapper.get(entity)
+        val positionComponent = positionMapper.get(entity)
         val collisionComponent = collisionMapper.get(entity)
         val movementComponent = movementMapper.get(entity)
 
-        with(spriteComponent.sprite) {
-            val newX = x + movementComponent.velocity.x * deltaTime
-            val newY = y + movementComponent.velocity.y * deltaTime
+        val height = textureMapper.get(entity).texture.height
+        val width = textureMapper.get(entity).texture.width
+
+        with(positionComponent) {
+            val newX = mapX + movementComponent.velocity.x * deltaTime
+            val newY = mapY + movementComponent.velocity.y * deltaTime
 
             collisionComponent.collidesOnX =
                 if (movementComponent.velocity.x < 0)
                 /*isTileWithCollisionAt(newX, y + height) // using old Y here so avoid going through corners diagonally
                         || isTileWithCollisionAt(newX, y / 2)
-                        ||*/ isTileWithCollisionAt(newX, y)
+                        ||*/ isTileWithCollisionAt(newX, mapY)
                 else if (movementComponent.velocity.x > 0)
                 /*isTileWithCollisionAt(newX + width, y + height)
                         || isTileWithCollisionAt(newX + width, y / 2)
-                        ||*/ isTileWithCollisionAt(newX + width, y)
+                        ||*/ isTileWithCollisionAt(newX + width, mapY)
                 else false
 
             collisionComponent.collidesOnY =
                 if (movementComponent.velocity.y < 0)  // down (or up)
-                    isTileWithCollisionAt(x, newY)
+                    isTileWithCollisionAt(mapX, newY)
                 /*|| isTileWithCollisionAt(x + width / 2, newY)
                 || isTileWithCollisionAt(x + width, newY)*/
                 else if (movementComponent.velocity.y > 0)
-                    isTileWithCollisionAt(x, newY + height)
+                    isTileWithCollisionAt(mapX, newY + height)
                 /*|| isTileWithCollisionAt(x + width / 2, newY + height)
                 || isTileWithCollisionAt(x + width, newY + height)*/
                 else false

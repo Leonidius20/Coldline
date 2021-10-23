@@ -13,8 +13,8 @@ import com.github.czyzby.noise4j.map.generator.room.dungeon.DungeonGenerator
 
 class LevelGenerator(tileSet: TiledMapTileSet) {
 
-    private val width = 50
-    private val height = 50
+    val width = 50
+    val height = 50
 
     private val tileWidth = 16
     private val tileHeight = 16
@@ -24,7 +24,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     private val horizontalWallTileTop = tileSet.getTile(2)
     private val verticalWallTileRight = tileSet.getTile(14)
     private val verticalWallTileLeft = tileSet.getTile(17)
-    private val floorTile = tileSet.getTile(95)
+    val floorTile = tileSet.getTile(95)
     private var doorTile = tileSet.getTile(32)
     private var chestTile = tileSet.getTile(65)
 

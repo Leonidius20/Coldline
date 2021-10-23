@@ -20,7 +20,7 @@ fun aStar(graph: Graph,
     distFromStart[start.index] = 0.0
 
     val q = PriorityQueue<GraphNode>(Comparator.comparingDouble {
-        distFromStart[it.index] + heuristic(it, end)
+        distFromStart[it.index] + 10 * heuristic(it, end)
     })
 
     q.add(start)

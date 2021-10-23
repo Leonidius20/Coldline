@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
@@ -34,8 +35,8 @@ class GameScreen(private val game: Main) : Screen {
 
     // TODO: create tile set loader
     private val tileSet = Level.load("maps/level2.tmx").map.tileSets.getTileSet(0)
-    private val levelGenerator = LevelGenerator(tileSet)
-    private val level = levelGenerator.generate()
+    val levelGenerator = LevelGenerator(tileSet)
+    val level = levelGenerator.generate()
     private val renderer = MapWithObjectsRenderer(level, 1F)
 
     private val keyboardController = KeyboardController(this)
@@ -63,19 +64,31 @@ class GameScreen(private val game: Main) : Screen {
     override fun show() {
         Gdx.input.inputProcessor = keyboardController
 
-        createEnemy(30, 12)
-        createEnemy(30, 24)
-        createEnemy(40, 30)
-        createEnemy(38, 19)
-        createEnemy(16, 45)
-        createEnemy(27, 45)
-
         with (level.objectLayer.objects.get("spawnPoint") as RectangleMapObject) {
             val player = createPlayer(rectangle.x, rectangle.y)
             playerSprite = player.getComponent(SpriteComponent::class.java).sprite
         }
 
         createDoor(exitTileX, exitTileX)
+
+        addEnemies()
+    }
+
+    fun addEnemies() {
+        repeat(5) {
+            val x = MathUtils.random(1, levelGenerator.width - 1)
+            val y = MathUtils.random(1, levelGenerator.height - 1)
+            if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
+                createEnemy(x, y, true) // dumb enemies
+            }
+        }
+        repeat(5) {
+            val x = MathUtils.random(1, levelGenerator.width - 1)
+            val y = MathUtils.random(1, levelGenerator.height - 1)
+            if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
+                createEnemy(x, y, false) // smart enemies
+            }
+        }
     }
 
     override fun render(delta: Float) {

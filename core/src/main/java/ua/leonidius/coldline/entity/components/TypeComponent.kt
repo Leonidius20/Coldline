@@ -7,5 +7,5 @@ data class TypeComponent(
 ): Component
 
 enum class EntityType {
-    PLAYER, ENEMY, DOOR, OTHER
+    PLAYER, ENEMY_DUMB, ENEMY_SMART, DOOR, OTHER
 }

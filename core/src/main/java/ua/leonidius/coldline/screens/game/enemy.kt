@@ -6,7 +6,7 @@ import ua.leonidius.coldline.entity.components.EntityType
 import ua.leonidius.coldline.entity.components.SpriteComponent
 import ua.leonidius.coldline.entity.components.TypeComponent
 
-fun GameScreen.createEnemy(tileX: Int, tileY: Int) {
+fun GameScreen.createEnemy(tileX: Int, tileY: Int, isDumb: Boolean) {
     with(engine) {
         createEntity().run {
             /*add(createComponent(PositionComponent::class.java).apply {
@@ -26,7 +26,7 @@ fun GameScreen.createEnemy(tileX: Int, tileY: Int) {
             })
 
             add(createComponent(TypeComponent::class.java).apply {
-                type = EntityType.ENEMY
+                type = if (isDumb) EntityType.ENEMY_DUMB else EntityType.ENEMY_SMART
             })
 
             addEntity(this)

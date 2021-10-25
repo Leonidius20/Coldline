@@ -67,7 +67,7 @@ class GameScreen(private val game: Main) : Screen {
             playerPosition = player.getComponent(PositionComponent::class.java)
         }
 
-        createDoor(exitTileX, exitTileX)
+        createDoor(exitTileX, exitTileY)
 
         engine.addSystem(CombatActivatorSystem(playerPosition))
         engine.addSystem(EnemyCombatSystem(playerPosition))

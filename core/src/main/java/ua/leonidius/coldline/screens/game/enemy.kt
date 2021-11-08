@@ -12,7 +12,7 @@ fun GameScreen.createEnemy(enemyTileX: Int, enemyTileY: Int, isEnemyDumb: Boolea
             })
 
             add(createComponent(TextureComponent::class.java).apply {
-                texture = Texture("enemy.png")
+                texture = Texture(if (isEnemyDumb) "random_enemy.png" else "enemy.png")
                 // TODO: dispose of the asset, maybe through asset manager
             })
 

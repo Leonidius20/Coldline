@@ -1,6 +1,6 @@
 package ua.leonidius.coldline.level
 
-class GameCoordinates {
+open class GameCoordinates {
 
     var mapX = -1F
     var mapY = -1F
@@ -11,7 +11,7 @@ class GameCoordinates {
 
     var tileY: Int
         get() = mapY.toInt() / 16
-        set(value) { mapX = value * 16F }
+        set(value) { mapY = value * 16F }
 
     companion object {
 

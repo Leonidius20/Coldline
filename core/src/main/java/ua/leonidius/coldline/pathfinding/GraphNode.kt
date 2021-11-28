@@ -1,9 +1,16 @@
 package ua.leonidius.coldline.pathfinding
 
-data class GraphNode(val index: Int, val mapX: Float, val mapY: Float) {
-    val tileX: Int
-        get() = mapX.toInt() / 16
+import ua.leonidius.coldline.level.GameCoordinates
 
-    val tileY: Int
-        get() = mapY.toInt() / 16
+class GraphNode: GameCoordinates {
+
+    val index: Int
+
+    @Suppress("ConvertSecondaryConstructorToPrimary")
+    constructor(index: Int, mapX: Float, mapY: Float): super() {
+        this.index = index
+        this.mapX = mapX
+        this.mapY = mapY
+    }
+
 }

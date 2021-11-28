@@ -51,9 +51,20 @@ class Graph {
         score
     }*/
 
-    /*fun findNodeAt(x: Int, y: Int): GraphNode? {
-        return nodes.find { it.tileX == x && it.tileY == y }
-    }*/
+    fun findNodeAt(x: Int, y: Int): GraphNode? {
+        val coords = arrayOf(
+            Pair(x, y), Pair(x, y + 1), Pair(x, y - 1), Pair(x + 1, y),
+            Pair(x - 1, y), Pair(x - 1, y - 1), Pair(x - 1, y + 1), Pair(x + 1, y - 1),
+            Pair(x + 1, y + 1),
+        )
+
+        for (coord in coords) {
+            val node = nodes.find { it.tileX == coord.first && it.tileY == coord.second }
+            if (node != null) return node
+        }
+
+        return null
+    }
 
     fun getAdjacentNodes(node: GraphNode) = /*connections
         .filter { it.fromNode == node || it.toNode == node }

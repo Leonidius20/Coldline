@@ -6,8 +6,11 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import com.badlogic.gdx.math.Vector2
 import ua.leonidius.coldline.entity.components.*
+import ua.leonidius.coldline.level.Level
+import ua.leonidius.coldline.pathfinding.algorithms.BreadthFirstSearchStrategy
 
-class EnemyCombatSystem(private val playerPos: PositionComponent): IntervalIteratingSystem(
+class EnemyCombatSystem(private val playerPos: PositionComponent,
+                        private val level: Level): IntervalIteratingSystem(
     Family.all(EnemyComponent::class.java).get(), 0.25F
 ) {
 
@@ -19,18 +22,26 @@ class EnemyCombatSystem(private val playerPos: PositionComponent): IntervalItera
         val enemyComponent = enemyMapper.get(entity)
         val movementComponent = movementMapper.get(entity)
         if (enemyComponent.isTriggered) {
-            val enemyPos = positionMapper.get(entity)
+            val enemyPos: PositionComponent = positionMapper.get(entity)
 
-            // TODO: if enemy is dumb, simply go there, if not, build an optimal route
-
-            val playerVector = Vector2(playerPos.mapX, playerPos.mapY)
             val enemyVector = Vector2(enemyPos.mapX, enemyPos.mapY)
 
-            // create bullet
+            if (enemyComponent.isDumb) {
+                val playerVector = Vector2(playerPos.mapX, playerPos.mapY)
+                movementComponent.velocity = playerVector.sub(enemyVector).nor()
+            } else {
+                // TODO: fix this shit
+                val enemyNode = level.tileGraph.findNodeAt(enemyPos.tileX, enemyPos.tileY)!!
+                val playerNode = level.tileGraph.findNodeAt(playerPos.tileX, playerPos.tileY)!!
 
-            movementComponent.velocity = playerVector.sub(enemyVector).nor()
+                val path = BreadthFirstSearchStrategy().findPath(
+                    level.tileGraph, enemyNode, playerNode)!!
 
-            // createBullet(movementComponent.velocity)
+                val nextNode = path[1]
+                val destinationVector = Vector2(nextNode.mapX, nextNode.mapY)
+
+                movementComponent.velocity = destinationVector.sub(enemyVector).nor()
+            }
         } else {
             movementComponent.velocity.apply { x = 0F; y = 0F }
         }

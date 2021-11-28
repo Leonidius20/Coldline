@@ -70,7 +70,7 @@ class GameScreen(private val game: Main) : Screen {
         createDoor(exitTileX, exitTileY)
 
         engine.addSystem(CombatActivatorSystem(playerPosition))
-        engine.addSystem(EnemyCombatSystem(playerPosition))
+        engine.addSystem(EnemyCombatSystem(playerPosition, level))
 
         addEnemies()
     }

@@ -1,4 +1,4 @@
-package ua.leonidius.coldline.pathfinding.graph_generators
+package ua.leonidius.coldline.level.generation
 
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.objects.RectangleMapObject

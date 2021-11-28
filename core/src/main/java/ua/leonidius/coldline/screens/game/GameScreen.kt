@@ -3,18 +3,17 @@ package ua.leonidius.coldline.screens.game
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.PositionComponent
 import ua.leonidius.coldline.entity.systems.*
-import ua.leonidius.coldline.level.Level
-import ua.leonidius.coldline.level.LevelGenerator
+import ua.leonidius.coldline.level.generation.LevelGenerator
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 import ua.leonidius.coldline.renderer.PathRenderer
 
@@ -30,10 +29,10 @@ class GameScreen(private val game: Main) : Screen {
         setToOrtho(false, 800F, 480F)
     }
 
-    private val assetManager = AssetManager()
+    // TODO: private val assetManager = AssetManager()
 
     // TODO: create tile set loader
-    private val tileSet = Level.load("maps/level2.tmx").map.tileSets.getTileSet(0)
+    private val tileSet = TmxMapLoader().load("maps/level2.tmx").tileSets.getTileSet(0)
     private val levelGenerator = LevelGenerator(tileSet)
     val level = levelGenerator.generate()
     private val renderer = MapWithObjectsRenderer(level, 1F)
@@ -43,8 +42,7 @@ class GameScreen(private val game: Main) : Screen {
     private var exitTileX = levelGenerator.doorTileX
     private var exitTileY = levelGenerator.doorTileY
 
-    val pathRenderer = PathRenderer(camera,
-        level.collisionLayer, level.objectLayer, tileSet.getTile(95))
+    val pathRenderer = PathRenderer(camera, level)
     var lastPathAlgorithm: String? = null
     var lastPathComputeTime = -1.0
 

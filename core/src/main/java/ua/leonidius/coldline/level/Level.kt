@@ -1,15 +1,30 @@
 package ua.leonidius.coldline.level
 
+import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
-import com.badlogic.gdx.math.Vector2
+import ua.leonidius.coldline.pathfinding.Graph
+import ua.leonidius.coldline.pathfinding.GraphNode
 
-class Level(val map: TiledMap, val exitTileCoords: Vector2) {
+class Level {
 
-    val objectLayer = map.layers["objects"]
-    val collisionLayer = map.layers.get("collision") as TiledMapTileLayer
+    lateinit var map: TiledMap
+
+    lateinit var doorCoordinates: GameCoordinates
+
+    lateinit var tileGraph: Graph
+    lateinit var spawnTileGraphNode: GraphNode
+    lateinit var doorTileGraphNode: GraphNode
+
+    lateinit var chestGraph: Graph
+    lateinit var spawnChestGraphNode: GraphNode
+    lateinit var doorChestGraphNode: GraphNode
+
+    val objectLayer: MapLayer
+        get() = map.layers["objects"]
+
+    val collisionLayer
+        get() = map.layers.get("collision") as TiledMapTileLayer
 
     fun dispose() {
         map.dispose()
@@ -20,15 +35,31 @@ class Level(val map: TiledMap, val exitTileCoords: Vector2) {
         // if it is a wall
     }
 
-    companion object {
+    class Builder {
 
-        fun load(tmxFile: String): Level {
-            val map = TmxMapLoader().load(tmxFile)
-            val objectLayer = map.layers["objects"]
-            val door = objectLayer.objects.find { it.name == "door" } as TiledMapTileMapObject
-            val doorCoords = Vector2(door.x, door.y)
-            return Level(map, doorCoords)
+        val level = Level()
+
+        fun setMap(map: TiledMap) {
+            level.map = map
         }
+
+        fun setDoorCoordinates(doorCoordinates: GameCoordinates) {
+            level.doorCoordinates = doorCoordinates
+        }
+
+        fun setTileGraph(graph: Graph, spawnNode: GraphNode, doorNode: GraphNode) {
+            level.tileGraph = graph
+            level.spawnTileGraphNode = spawnNode
+            level.doorTileGraphNode = doorNode
+        }
+
+        fun setChestGraph(graph: Graph, spawnNode: GraphNode, doorNode: GraphNode) {
+            level.chestGraph = graph
+            level.spawnChestGraphNode = spawnNode
+            level.doorChestGraphNode = doorNode
+        }
+
+        fun get() = level
 
     }
 

@@ -4,35 +4,20 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.maps.MapLayer
-import com.badlogic.gdx.maps.tiled.TiledMapTile
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
+import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.pathfinding.GraphNode
 import ua.leonidius.coldline.pathfinding.algorithms.AStarStrategy
 import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.AStarTSPStrategy
 import ua.leonidius.coldline.pathfinding.algorithms.heuristics.EuclideanHeuristic
 import ua.leonidius.coldline.pathfinding.algorithms.heuristics.GreedyHeuristic
 import ua.leonidius.coldline.pathfinding.algorithms.heuristics.ManhattanHeuristic
-import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithChests
-import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithTiles
 import ua.leonidius.coldline.timing.measureTime
 
 class PathRenderer(private val camera: OrthographicCamera,
-                   collisionLayer: TiledMapTileLayer,
-                   objectLayer: MapLayer, floorTile: TiledMapTile) {
+                   private val level: Level) {
 
     private val shapeRenderer = ShapeRenderer()
-
-    private val _trio = generateGraphWithTiles(collisionLayer, objectLayer, floorTile)
-    val graph = _trio.first
-    private val startNode = _trio.second
-    private val endNode = _trio.third
-
-    private val _chestTriple = generateGraphWithChests(objectLayer)
-    private val chestGraph = _chestTriple.first
-    private val chestGraphStart = _chestTriple.second
-    private val chestGraphEnd = _chestTriple.third
 
     /**
      * Whether to display the complete path or pointers to the next node
@@ -45,9 +30,9 @@ class PathRenderer(private val camera: OrthographicCamera,
 
     private val algorithms = arrayOf(
         Triple("None", Color.CLEAR, null),
-        Triple("A* with chests/Euclidean", Color.BROWN, AStarTSPStrategy(chestGraph, chestGraphStart, chestGraphEnd, EuclideanHeuristic())),
-        Triple("A* with chests/Manhattan", Color.BROWN, AStarTSPStrategy(chestGraph, chestGraphStart, chestGraphEnd, ManhattanHeuristic())),
-        Triple("A* with chests/Greedy", Color.BROWN, AStarTSPStrategy(chestGraph, chestGraphStart, chestGraphEnd, GreedyHeuristic())),
+        Triple("A* with chests/Euclidean", Color.BROWN, AStarTSPStrategy(level.chestGraph, level.spawnChestGraphNode, level.doorChestGraphNode, EuclideanHeuristic())),
+        Triple("A* with chests/Manhattan", Color.BROWN, AStarTSPStrategy(level.chestGraph, level.spawnChestGraphNode, level.doorChestGraphNode, ManhattanHeuristic())),
+        Triple("A* with chests/Greedy", Color.BROWN, AStarTSPStrategy(level.chestGraph, level.spawnChestGraphNode, level.doorChestGraphNode, GreedyHeuristic())),
         Triple("A*/Euclidean", Color.TEAL, AStarStrategy(EuclideanHeuristic())),
         Triple("A*/Manhattan", Color.RED, AStarStrategy(ManhattanHeuristic())),
         Triple("A*/Greedy", Color.YELLOW, AStarStrategy(GreedyHeuristic())),
@@ -101,7 +86,7 @@ class PathRenderer(private val camera: OrthographicCamera,
 
             val computeTime = measureTime {
                 path = algorithms[currentAlgorithmIndex].third!!
-                    .findPath(graph, startNode, endNode)
+                    .findPath(level.tileGraph, level.spawnTileGraphNode, level.doorTileGraphNode)
             }
 
             currentDestinationIndex = 1

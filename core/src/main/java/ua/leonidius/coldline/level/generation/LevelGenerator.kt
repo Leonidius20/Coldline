@@ -1,15 +1,17 @@
-package ua.leonidius.coldline.level
+package ua.leonidius.coldline.level.generation
 
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector2
 import com.github.czyzby.noise4j.map.Grid
 import com.github.czyzby.noise4j.map.generator.room.dungeon.DungeonGenerator
+import ua.leonidius.coldline.level.GameCoordinates
+import ua.leonidius.coldline.level.Level
 
 class LevelGenerator(tileSet: TiledMapTileSet) {
 
@@ -35,6 +37,23 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     var doorTileY = -1
 
     fun generate(): Level {
+        val builder = Level.Builder()
+
+        generateMap(builder)
+
+        generateGraphs(builder)
+
+        return builder.get()
+    }
+
+    fun load(tmxFile: String): Level {
+        val builder = Level.Builder()
+        loadMap(tmxFile, builder)
+        generateGraphs(builder)
+        return builder.get()
+    }
+
+    private fun generateMap(builder: Level.Builder) {
         val grid = Grid(width / 2, height / 2)
 
         DungeonGenerator().apply {
@@ -68,7 +87,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
 
         placeWalls()
 
-        placeDoor()
+        placeDoor(builder)
 
         placeSpawnPoint()
 
@@ -77,8 +96,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         map.layers.add(collisionLayer)
         map.layers.add(objectLayer)
 
-        // TODO: garbage coordinates
-        return Level(map, Vector2(45F, 45F))
+        builder.setMap(map)
     }
 
     private fun placeWalls() {
@@ -136,7 +154,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         }
     }
 
-    private fun placeDoor() {
+    private fun placeDoor(builder: Level.Builder) {
         for (y in height - 2 downTo 1) {
             for (x in 1 until width - 2) {
                 if (is3x3RadiusEmpty(x, y)) {
@@ -147,6 +165,7 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
                         this.x = (x * tileWidth).toFloat()
                         this.y = (y * tileHeight).toFloat()
                     })
+                    builder.setDoorCoordinates(GameCoordinates.fromTile(doorTileX, doorTileY))
                     return
                 }
             }
@@ -199,6 +218,23 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
                 })
             }
         }
+    }
+
+    private fun generateGraphs(builder: Level.Builder) {
+        val tileGraphTrio = generateGraphWithTiles(collisionLayer, objectLayer, floorTile)
+        builder.setTileGraph(tileGraphTrio.first, tileGraphTrio.second, tileGraphTrio.third)
+
+        val chestGraphTrio = generateGraphWithChests(objectLayer)
+        builder.setChestGraph(chestGraphTrio.first, chestGraphTrio.second, chestGraphTrio.third)
+    }
+
+    private fun loadMap(tmxFile: String, builder: Level.Builder) {
+        val map = TmxMapLoader().load(tmxFile)
+        val objectLayer = map.layers["objects"]
+        val door = objectLayer.objects.find { it.name == "door" } as TiledMapTileMapObject
+
+        builder.setMap(map)
+        builder.setDoorCoordinates(GameCoordinates.fromMap(door.x, door.y))
     }
 
 }

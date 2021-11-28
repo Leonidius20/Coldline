@@ -45,6 +45,8 @@ class GameScreen(private val game: Main) : Screen {
 
     val pathRenderer = PathRenderer(camera,
         level.collisionLayer, level.objectLayer, tileSet.getTile(95))
+    var lastPathAlgorithm: String? = null
+    var lastPathComputeTime = -1.0
 
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera))
@@ -136,7 +138,9 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     fun switchPathAlgo() {
-        pathRenderer.switchPathAlgorithm()
+        val data = pathRenderer.switchPathAlgorithm()
+        lastPathAlgorithm = data.first
+        lastPathComputeTime = data.second
     }
 
     fun switchPathHighlightingMode() {
@@ -157,10 +161,10 @@ class GameScreen(private val game: Main) : Screen {
 
     private fun printPathComputeTime(batch: Batch) {
         pathRenderer.let {
-            if (it.lastUsedAlgorithm.isNotEmpty()) {
+            if (lastPathAlgorithm != null) {
                 game.bitmapFont.draw(
                     batch,
-                    "${it.lastUsedAlgorithm}: ${it.lastComputeTime}ms",
+                    "${lastPathAlgorithm}: ${lastPathComputeTime}ms",
                     0F, 80F
                 )
             }

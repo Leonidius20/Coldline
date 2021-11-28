@@ -9,8 +9,11 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.math.Polyline
 import ua.leonidius.coldline.pathfinding.GraphNode
-import ua.leonidius.coldline.pathfinding.algorithms.*
-import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.aStarWithChests
+import ua.leonidius.coldline.pathfinding.algorithms.AStarStrategy
+import ua.leonidius.coldline.pathfinding.algorithms.aStarWithChests.AStarTSPStrategy
+import ua.leonidius.coldline.pathfinding.algorithms.heuristics.EuclideanHeuristic
+import ua.leonidius.coldline.pathfinding.algorithms.heuristics.GreedyHeuristic
+import ua.leonidius.coldline.pathfinding.algorithms.heuristics.ManhattanHeuristic
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithChests
 import ua.leonidius.coldline.pathfinding.graph_generators.generateGraphWithTiles
 import ua.leonidius.coldline.timing.measureTime
@@ -18,20 +21,6 @@ import ua.leonidius.coldline.timing.measureTime
 class PathRenderer(private val camera: OrthographicCamera,
                    collisionLayer: TiledMapTileLayer,
                    objectLayer: MapLayer, floorTile: TiledMapTile) {
-
-    enum class PathAlgorithmTypes(val id: Int, val color: Color) {
-        NONE(0, Color.CLEAR),
-        //BFS(1, Color.YELLOW),
-        //DFS(2, Color.RED),
-        //UCS(3, Color.GREEN),
-        A_STAR_WITH_CHESTS_EUCLIDIAN(1, Color.BROWN),
-        A_STAR_WITH_CHESTS_MANHATTAN(2, Color.BROWN),
-        A_STAR_WITH_CHESTS_GREEDY(3, Color.BROWN),
-        A_STAR_EUCLIDIAN(4, Color.TEAL),
-        A_STAR_MANHATTAN(5, Color.RED),
-        A_STAR_GREEDY(6, Color.YELLOW),
-
-    }
 
     private val shapeRenderer = ShapeRenderer()
 
@@ -45,23 +34,34 @@ class PathRenderer(private val camera: OrthographicCamera,
     private val chestGraphStart = _chestTriple.second
     private val chestGraphEnd = _chestTriple.third
 
-    private var currentPathAlgorithm = PathAlgorithmTypes.NONE
-
+    /**
+     * Whether to display the complete path or pointers to the next node
+     * while the player is walking along the path
+     */
     var displayWholePath = true
     var currentDestinationIndex = 1 // index of current node in path that is the destination
 
     lateinit var path: List<GraphNode>
 
-    var lastUsedAlgorithm = ""
-    var lastComputeTime = -1.0
+    private val algorithms = arrayOf(
+        Triple("None", Color.CLEAR, null),
+        Triple("A* with chests/Euclidean", Color.BROWN, AStarTSPStrategy(chestGraph, chestGraphStart, chestGraphEnd, EuclideanHeuristic())),
+        Triple("A* with chests/Manhattan", Color.BROWN, AStarTSPStrategy(chestGraph, chestGraphStart, chestGraphEnd, ManhattanHeuristic())),
+        Triple("A* with chests/Greedy", Color.BROWN, AStarTSPStrategy(chestGraph, chestGraphStart, chestGraphEnd, GreedyHeuristic())),
+        Triple("A*/Euclidean", Color.TEAL, AStarStrategy(EuclideanHeuristic())),
+        Triple("A*/Manhattan", Color.RED, AStarStrategy(ManhattanHeuristic())),
+        Triple("A*/Greedy", Color.YELLOW, AStarStrategy(GreedyHeuristic())),
+    )
+
+    private var currentAlgorithmIndex = 0
 
     fun render() {
-        if (currentPathAlgorithm != PathAlgorithmTypes.NONE) {
+        if (currentAlgorithmIndex != 0) { // 0 = no algorithm
             shapeRenderer.projectionMatrix = camera.combined
             Gdx.gl.glLineWidth(10F)
 
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line)
-            shapeRenderer.color = currentPathAlgorithm.color
+            shapeRenderer.color = algorithms[currentAlgorithmIndex].second
 
             if (displayWholePath) {
 
@@ -91,76 +91,26 @@ class PathRenderer(private val camera: OrthographicCamera,
         }
     }
 
-    fun switchPathAlgorithm() {
-        val newPathAlgorithm =  PathAlgorithmTypes.values()[(currentPathAlgorithm.id + 1) % PathAlgorithmTypes.values().size]
+    /**
+     * @return a pair of the name of the algorithm used and time it took to find a way in ms
+     */
+    fun switchPathAlgorithm(): Pair<String?, Double> {
+        currentAlgorithmIndex = (currentAlgorithmIndex + 1) % algorithms.size
 
-        if (newPathAlgorithm != PathAlgorithmTypes.NONE) {
-            val nodeStart = startNode
-            val nodeEnd = endNode
+        if (currentAlgorithmIndex != 0) { // 0 = no algorithm
 
-            var timeElapsed = -1.0
-
-            when(newPathAlgorithm) {
-                /*PathAlgorithmTypes.DFS -> {
-                    timeElapsed = measureTime {
-                        path = dfs(graph, nodeStart, nodeEnd)!!
-                    }
-                }
-                PathAlgorithmTypes.BFS -> {
-                    timeElapsed = measureTime {
-                        path = bfs(graph, nodeStart, nodeEnd)!!
-                    }
-                }
-                PathAlgorithmTypes.UCS -> {
-                    timeElapsed = measureTime {
-                        path = uniformCostSearch(graph, nodeStart, nodeEnd)
-                    }
-                }*/
-                PathAlgorithmTypes.A_STAR_EUCLIDIAN -> {
-                    timeElapsed = measureTime {
-                        path = aStar(graph, nodeStart, nodeEnd, ::euclidianHeuristic)
-                    }
-                }
-                PathAlgorithmTypes.A_STAR_MANHATTAN -> {
-                    timeElapsed = measureTime {
-                        path = aStar(graph, nodeStart, nodeEnd, ::manhattanHeuristic)
-                    }
-                }
-                PathAlgorithmTypes.A_STAR_GREEDY -> {
-                    timeElapsed = measureTime {
-                        path = aStar(graph, nodeStart, nodeEnd, ::greedyHeuristic)
-                    }
-                }
-                PathAlgorithmTypes.A_STAR_WITH_CHESTS_EUCLIDIAN -> {
-                    timeElapsed = measureTime {
-                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::euclidianHeuristic)
-                        // path = nearestNeighborTsp(chestGraph, chestGraphStart, chestGraphEnd)
-                    }
-                }
-                PathAlgorithmTypes.A_STAR_WITH_CHESTS_MANHATTAN -> {
-                    timeElapsed = measureTime {
-                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::manhattanHeuristic)
-                    }
-                }
-                PathAlgorithmTypes.A_STAR_WITH_CHESTS_GREEDY -> {
-                    timeElapsed = measureTime {
-                        path = aStarWithChests(chestGraph, chestGraphStart, chestGraphEnd, graph, ::greedyHeuristic)
-                    }
-                }
-                else -> {
-                    path = dfs(graph, nodeStart, nodeEnd)!!
-                }
+            val computeTime = measureTime {
+                path = algorithms[currentAlgorithmIndex].third!!
+                    .findPath(graph, startNode, endNode)
             }
 
-            lastUsedAlgorithm = newPathAlgorithm.name
-            lastComputeTime = timeElapsed
-
             currentDestinationIndex = 1
-        } else {
-            lastUsedAlgorithm = ""
+
+            val algorithmName = algorithms[currentAlgorithmIndex].first
+            return Pair(algorithmName, computeTime)
         }
 
-        currentPathAlgorithm = newPathAlgorithm
+        return Pair(null, -1.0)
     }
 
 }

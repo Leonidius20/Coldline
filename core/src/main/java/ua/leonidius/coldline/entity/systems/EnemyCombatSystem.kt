@@ -21,6 +21,8 @@ class EnemyCombatSystem(private val playerPos: PositionComponent): IntervalItera
         if (enemyComponent.isTriggered) {
             val enemyPos = positionMapper.get(entity)
 
+            // TODO: if enemy is dumb, simply go there, if not, build an optimal route
+
             val playerVector = Vector2(playerPos.mapX, playerPos.mapY)
             val enemyVector = Vector2(enemyPos.mapX, enemyPos.mapY)
 

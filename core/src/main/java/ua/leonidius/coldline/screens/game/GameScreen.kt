@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
+import ua.leonidius.coldline.entity.components.HealthComponent
 import ua.leonidius.coldline.entity.components.PositionComponent
 import ua.leonidius.coldline.entity.systems.*
 import ua.leonidius.coldline.level.generation.LevelGenerator
@@ -67,6 +68,7 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     private lateinit var playerPosition: PositionComponent
+    private lateinit var playerHealth: HealthComponent
 
     override fun show() {
         Gdx.input.inputProcessor = keyboardController
@@ -74,6 +76,7 @@ class GameScreen(private val game: Main) : Screen {
         with (level.objectLayer.objects.get("spawnPoint") as RectangleMapObject) {
             val player = createPlayer(rectangle.x, rectangle.y)
             playerPosition = player.getComponent(PositionComponent::class.java)
+            playerHealth = player.getComponent(HealthComponent::class.java)
         }
 
         createDoor(exitTileX, exitTileY)
@@ -164,6 +167,7 @@ class GameScreen(private val game: Main) : Screen {
         printPathComputeTime(batch)
         printPlayerLocation(batch)
         printDoorLocation(batch)
+        printPlayerHealth(batch)
     }
 
     private fun printPathComputeTime(batch: Batch) {
@@ -192,7 +196,14 @@ class GameScreen(private val game: Main) : Screen {
             "x = ${playerPosition.tileX}, y = ${playerPosition.tileY}",
             0F, 50F
         )
+    }
 
+    private fun printPlayerHealth(batch: Batch) {
+        game.bitmapFont.draw(
+            batch,
+            "${playerHealth.health} HP",
+            0F, 80F
+        )
     }
 
     fun gameOver() {

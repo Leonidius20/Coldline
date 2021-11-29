@@ -20,6 +20,14 @@ import ua.leonidius.coldline.renderer.PathRenderer
 
 class GameScreen(private val game: Main) : Screen {
 
+    companion object {
+        lateinit var instance: GameScreen
+    }
+
+    init {
+        instance = this
+    }
+
     private val camera = OrthographicCamera().apply {
         setToOrtho(false, 800F, 480F)
         zoom = 0.3F
@@ -55,6 +63,7 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(DoorSystem(game::toMenuScreen))
         addSystem(PathHighlightingSystem(pathRenderer))
         addSystem(DeathSystem())
+        addSystem(EnemyHarmSystem())
     }
 
     private lateinit var playerPosition: PositionComponent
@@ -184,6 +193,10 @@ class GameScreen(private val game: Main) : Screen {
             0F, 50F
         )
 
+    }
+
+    fun gameOver() {
+        game.toMenuScreen()
     }
 
 }

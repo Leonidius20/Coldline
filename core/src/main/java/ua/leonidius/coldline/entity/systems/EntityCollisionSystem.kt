@@ -22,6 +22,10 @@ class EntityCollisionSystem: IntervalSystem(0.25F) {
     override fun updateInterval() {
         entities = engine.getEntitiesFor(Family.all(CollisionComponent::class.java).get())
 
+        for (entity in entities) {
+            collisionMapper.get(entity).collidesWith = null
+        }
+
         for (i in 0 until entities.size()) {
             for (j in i + 1 until entities.size()) {
                 val entity1 = entities[i]

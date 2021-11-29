@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import ua.leonidius.coldline.entity.components.HealthComponent
+import ua.leonidius.coldline.entity.components.PlayerComponent
+import ua.leonidius.coldline.screens.game.GameScreen
 
 class DeathSystem: IteratingSystem(
     Family.all(HealthComponent::class.java).get()
@@ -12,11 +14,14 @@ class DeathSystem: IteratingSystem(
 
     private val healthMapper = ComponentMapper.getFor(HealthComponent::class.java)
 
-    override fun processEntity(entity: Entity?, deltaTime: Float) {
+    override fun processEntity(entity: Entity, deltaTime: Float) {
         if (healthMapper.get(entity).health <= 0) {
-            engine.removeEntity(entity)
+            // TODO: replace with type component
+            if (entity.components.any { it is PlayerComponent }) {
+                GameScreen.instance.gameOver()
+            }
 
-            // TODO: if it is player - game over
+            engine.removeEntity(entity)
         }
     }
 

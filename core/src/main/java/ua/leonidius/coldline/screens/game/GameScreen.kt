@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.HealthComponent
 import ua.leonidius.coldline.entity.components.PositionComponent
+import ua.leonidius.coldline.entity.components.ScoreComponent
 import ua.leonidius.coldline.entity.systems.*
 import ua.leonidius.coldline.level.generation.LevelGenerator
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
@@ -61,14 +63,16 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(MovementSystem())
         addSystem(WallCollisionSystem(level.collisionLayer))
         addSystem(EntityCollisionSystem())
-        addSystem(DoorSystem(game::toMenuScreen))
+        addSystem(DoorSystem(::gameOver))
         addSystem(PathHighlightingSystem(pathRenderer))
         addSystem(DeathSystem())
         addSystem(EnemyHarmSystem())
+        addSystem(ChestCollectionSystem())
     }
 
     private lateinit var playerPosition: PositionComponent
     private lateinit var playerHealth: HealthComponent
+    private lateinit var playerScore: ScoreComponent
 
     override fun show() {
         Gdx.input.inputProcessor = keyboardController
@@ -77,14 +81,27 @@ class GameScreen(private val game: Main) : Screen {
             val player = createPlayer(rectangle.x, rectangle.y)
             playerPosition = player.getComponent(PositionComponent::class.java)
             playerHealth = player.getComponent(HealthComponent::class.java)
+            playerScore = player.getComponent(ScoreComponent::class.java)
         }
 
+        // TODO: similar to addCHestEntities()
         createDoor(exitTileX, exitTileY)
+
+        addChestEntities()
 
         engine.addSystem(CombatActivatorSystem(playerPosition))
         engine.addSystem(EnemyCombatSystem(playerPosition, level))
 
         addEnemies()
+    }
+
+    private fun addChestEntities() {
+        level.objectLayer.objects
+            .filter { it.properties.get("tag") == "chest" }
+            .forEach {
+                val chest = it as TiledMapTileMapObject
+                createChest(chest.x, chest.y)
+            }
     }
 
     private fun addEnemies() {
@@ -167,7 +184,7 @@ class GameScreen(private val game: Main) : Screen {
         printPathComputeTime(batch)
         printPlayerLocation(batch)
         printDoorLocation(batch)
-        printPlayerHealth(batch)
+        printPlayerStats(batch)
     }
 
     private fun printPathComputeTime(batch: Batch) {
@@ -198,16 +215,22 @@ class GameScreen(private val game: Main) : Screen {
         )
     }
 
-    private fun printPlayerHealth(batch: Batch) {
+    private fun printPlayerStats(batch: Batch) {
         game.bitmapFont.draw(
             batch,
             "${playerHealth.health} HP",
+            0F, 110F
+        )
+        game.bitmapFont.draw(
+            batch,
+            "Traversed ${playerScore.distanceTraversed.toInt()}tl, collected ${playerScore.chestsCollected} chests",
             0F, 80F
         )
     }
 
     fun gameOver() {
-        game.toMenuScreen()
+        val score = if (playerHealth.health <= 0) 0 else  1000 / playerScore.distanceTraversed + playerScore.chestsCollected * 20 + playerHealth.health
+        game.toMenuScreen(score.toInt())
     }
 
 }

@@ -28,6 +28,8 @@ fun GameScreen.createPlayer(playerMapX: Float, playerMapY: Float): Entity {
 
             add(createComponent(HealthComponent::class.java))
 
+            add(createComponent(ScoreComponent::class.java))
+
             addEntity(this)
 
             return this

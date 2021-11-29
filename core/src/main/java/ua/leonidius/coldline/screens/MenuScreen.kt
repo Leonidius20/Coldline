@@ -2,14 +2,12 @@ package ua.leonidius.coldline.screens
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.tiled.TiledMapTileSet
 import com.badlogic.gdx.utils.ScreenUtils
 import ua.leonidius.coldline.Main
 
 /** First screen of the application. Displayed after the application is created.  */
-class MenuScreen(private val game: Main) : Screen {
+class MenuScreen(private val game: Main, private val score: Int?) : Screen {
 
     private var doneLoading = false
 
@@ -36,6 +34,10 @@ class MenuScreen(private val game: Main) : Screen {
             if (!assetManager.update(17)) {
                 bitmapFont.draw(batch, "Loading assets...", 400F, 240F)
             } else doneLoading = true
+
+            if (score != null) {
+                bitmapFont.draw(batch, "Score: $score", 400F, 240F)
+            }
 
             batch.end()
         }

@@ -16,6 +16,7 @@ import ua.leonidius.coldline.entity.components.HealthComponent
 import ua.leonidius.coldline.entity.components.PositionComponent
 import ua.leonidius.coldline.entity.components.ScoreComponent
 import ua.leonidius.coldline.entity.systems.*
+import ua.leonidius.coldline.entity.systems.player_ai.PlayerAISystem
 import ua.leonidius.coldline.level.generation.LevelGenerator
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 import ua.leonidius.coldline.renderer.PathRenderer
@@ -68,6 +69,7 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(DeathSystem())
         addSystem(EnemyHarmSystem())
         addSystem(ChestCollectionSystem())
+        addSystem(PlayerAISystem(level))
     }
 
     private lateinit var playerPosition: PositionComponent

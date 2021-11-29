@@ -35,6 +35,12 @@ class Level {
         // if it is a wall
     }
 
+    fun isTileWithCollisionAt(tileX: Int, tileY: Int) =
+        collisionLayer.run {
+            val cell = getCell(tileX, tileY)
+            cell?.tile?.properties?.containsKey("blocked") ?: false
+        }
+
     class Builder {
 
         val level = Level()

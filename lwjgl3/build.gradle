@@ -4,6 +4,7 @@ sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'ua.leonidius.coldline.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 8.0
+applicationDefaultJvmArgs = ["-Xss100m"] // 10 MB stack for minmax algo
 
 dependencies {
 	implementation project(':core')

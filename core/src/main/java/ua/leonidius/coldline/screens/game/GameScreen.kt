@@ -58,6 +58,9 @@ class GameScreen(private val game: Main) : Screen {
     var lastPathAlgorithm: String? = null
     var lastPathComputeTime = -1.0
 
+    var move: Pair<Int, Int> = Pair(0, 0)
+    var reusing = 0
+
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera))
         addSystem(PlayerControlSystem(keyboardController))
@@ -107,14 +110,14 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     private fun addEnemies() {
-        repeat(5) {
+        repeat(1) {
             val x = MathUtils.random(1, levelGenerator.width - 1)
             val y = MathUtils.random(1, levelGenerator.height - 1)
             if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
                 createEnemy(x, y, true) // dumb enemies
             }
         }
-        repeat(5) {
+        repeat(1) {
             val x = MathUtils.random(1, levelGenerator.width - 1)
             val y = MathUtils.random(1, levelGenerator.height - 1)
             if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
@@ -221,12 +224,17 @@ class GameScreen(private val game: Main) : Screen {
         game.bitmapFont.draw(
             batch,
             "${playerHealth.health} HP",
-            0F, 110F
+            0F, 140F
         )
         game.bitmapFont.draw(
             batch,
             "Traversed ${playerScore.distanceTraversed.toInt()}tl, collected ${playerScore.chestsCollected} chests",
             0F, 80F
+        )
+        game.bitmapFont.draw(
+            batch,
+            "Moving x = ${move.first} y = ${move.second}, reusing ${reusing}",
+            0F, 110F
         )
     }
 

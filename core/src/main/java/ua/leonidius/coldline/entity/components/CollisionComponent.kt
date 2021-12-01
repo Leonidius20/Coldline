@@ -8,7 +8,9 @@ import com.badlogic.ashley.core.Entity
  * walls and other obstacles (e.g. player, enemy)
  */
 data class CollisionComponent(
-    var collidesOnX: Boolean = false,
-    var collidesOnY: Boolean = false,
+    var collidesOnXPositive: Boolean = false,
+    var collidesOnXNegative: Boolean = false,
+    var collidesOnYPositive: Boolean = false,
+    var collidesOnYNegative: Boolean = false,
     var collidesWith: Entity? = null,
 ): Component

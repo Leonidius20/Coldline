@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import com.badlogic.gdx.math.Vector2
 import ua.leonidius.coldline.entity.components.*
+import ua.leonidius.coldline.level.GameCoordinates
 import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.pathfinding.algorithms.BreadthFirstSearchStrategy
 
@@ -24,11 +25,8 @@ class EnemyCombatSystem(private val playerPos: PositionComponent,
         if (enemyComponent.isTriggered) {
             val enemyPos: PositionComponent = positionMapper.get(entity)
 
-            val enemyVector = Vector2(enemyPos.mapX, enemyPos.mapY)
-
             if (enemyComponent.isDumb) {
-                val playerVector = Vector2(playerPos.mapX, playerPos.mapY)
-                movementComponent.velocity = playerVector.sub(enemyVector).nor()
+                movementComponent.velocity = playerPos.vectorSub(enemyPos)
             } else {
                 // TODO: fix this shit
                 val enemyNode = level.tileGraph.findNodeAt(enemyPos.tileX, enemyPos.tileY)!!
@@ -38,12 +36,12 @@ class EnemyCombatSystem(private val playerPos: PositionComponent,
                     level.tileGraph, enemyNode, playerNode)!!
 
                 val nextNode = path[1]
-                val destinationVector = Vector2(nextNode.mapX, nextNode.mapY)
+                val destinationXY = GameCoordinates.fromTile(nextNode.tileX, nextNode.tileY)
 
-                movementComponent.velocity = destinationVector.sub(enemyVector).nor()
+                movementComponent.velocity = destinationXY.vectorSub(enemyPos)
             }
         } else {
-            movementComponent.velocity.apply { x = 0F; y = 0F }
+            movementComponent.velocity = Pair(0, 0)
         }
     }
 

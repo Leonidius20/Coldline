@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.graphics.OrthographicCamera
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.MovementComponent
 import ua.leonidius.coldline.entity.components.PlayerComponent
@@ -22,15 +21,17 @@ class PlayerControlSystem(
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val movementComponent = movementMapper.get(entity)
         with(movementComponent) {
-            velocity.y =
+            val velocityY =
                 if (keyboardController.up) speed
                 else if (keyboardController.down) -speed
-                else 0F
+                else 0
 
-            velocity.x =
+            val velocityX =
                 if (keyboardController.right) speed
                 else if (keyboardController.left) -speed
-                else 0F
+                else 0
+
+            velocity = Pair(velocityX, velocityY)
         }
     }
 

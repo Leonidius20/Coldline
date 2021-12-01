@@ -65,7 +65,7 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(RenderingSystem(renderer.batch, camera))
         addSystem(PlayerControlSystem(keyboardController))
         addSystem(MovementSystem())
-        addSystem(WallCollisionSystem(level.collisionLayer))
+        addSystem(WallCollisionSystem(level))
         addSystem(EntityCollisionSystem())
         addSystem(DoorSystem(::gameOver))
         addSystem(PathHighlightingSystem(pathRenderer))

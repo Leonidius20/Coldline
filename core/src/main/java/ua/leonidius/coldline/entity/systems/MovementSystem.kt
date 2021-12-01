@@ -3,18 +3,16 @@ package ua.leonidius.coldline.entity.systems
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.ashley.systems.IntervalIteratingSystem
 import ua.leonidius.coldline.entity.components.*
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 /**
  * System to move entities that have collision
  */
-class MovementSystem: IteratingSystem(
+class MovementSystem: IntervalIteratingSystem(
     Family.all(MovementComponent::class.java,
         TextureComponent::class.java,
-        CollisionComponent::class.java).get(), 3
+        CollisionComponent::class.java).get(), 0.25F, 3
 ) {
 
     private val movementMapper
@@ -28,28 +26,30 @@ class MovementSystem: IteratingSystem(
 
     private val typeMapper = ComponentMapper.getFor(TypeComponent::class.java)
 
-    override fun processEntity(entity: Entity, deltaTime: Float) {
+    override fun processEntity(entity: Entity) {
         val movementComponent = movementMapper.get(entity)
         val positionComponent = positionMapper.get(entity)
         val collisionComponent = collisionMapper.get(entity)
 
-        var deltaX = movementComponent.velocity.x * movementComponent.speed * deltaTime
-        var deltaY = movementComponent.velocity.y * movementComponent.speed * deltaTime
+        var deltaX = movementComponent.velocity.first * movementComponent.speed
+        var deltaY = movementComponent.velocity.second * movementComponent.speed
 
         positionComponent.apply {
-            if (!collisionComponent.collidesOnX) {
-                mapX += deltaX
-            } else deltaX = 0F
+            if (deltaX < 0 && !collisionComponent.collidesOnXNegative
+                || deltaX > 0 && !collisionComponent.collidesOnXPositive)
+            {
+                tileX += deltaX
+            } else deltaX = 0
 
-            if (!collisionComponent.collidesOnY)
-                mapY += deltaY
-            else deltaY = 0F
+            if (deltaY < 0 && !collisionComponent.collidesOnYNegative
+                || deltaY > 0 && !collisionComponent.collidesOnYPositive) {
+                tileY += deltaY
+            } else deltaY = 0
         }
 
         if (typeMapper.get(entity).type == EntityType.PLAYER) {
             val scoreMapper = ComponentMapper.getFor(ScoreComponent::class.java)
-            scoreMapper.get(entity).distanceTraversed +=
-                sqrt(deltaX.pow(2) + deltaY.pow(2)) / 16
+            scoreMapper.get(entity).distanceTraversed += if (deltaX + deltaY == 0) 0 else 1
         }
 
     }

@@ -1,17 +1,19 @@
 package ua.leonidius.coldline.entity.systems.player_ai
 
+import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
+import ua.leonidius.coldline.entity.components.PositionComponent
+import ua.leonidius.coldline.level.GameCoordinates
 
 class MinMaxPlayerAIStrategy(
-    private val isTerminalState: (Entity, Pair<Int, Int>) -> Boolean,
-    private val heuristic: (Entity, Pair<Int, Int>) -> Double,
+    private val isTerminalState: (Entity, GameCoordinates) -> Boolean,
+    private val heuristic: (Entity, GameCoordinates) -> Double,
     private val getPossibleMoves: (Entity) -> List<Pair<Int, Int>>
 ): PlayerAIStrategy {
 
     data class Node(
-        var position: Pair<Int, Int>,
+        var levelState: Map<Entity, GameCoordinates>,
         var value: Float = -1F,
-        var move: Pair<Int, Int>? = null,
     )
 
     private val maxDepth = 3
@@ -21,10 +23,19 @@ class MinMaxPlayerAIStrategy(
     private var player: Entity? = null
     private var enemies = emptyList<Entity>()
 
-    override fun findNextMove(player: Entity, enemies: List<Entity>, position: Pair<Int, Int>): Node {
+    override fun findNextMove(player: Entity, enemies: List<Entity>, playerPos: GameCoordinates): Node {
         this.player = player
         this.enemies = enemies
-        return minmax(0, Node(position), playerIndex, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY)
+
+        val levelState = mutableMapOf<Entity, GameCoordinates>()
+        levelState[player] = playerPos.clone()
+
+        val positionMapper = ComponentMapper.getFor(PositionComponent::class.java)
+        for (enemy in enemies) {
+            levelState[enemy] = positionMapper.get(enemy).clone()
+        }
+
+        return minmax(0, Node(levelState), playerIndex, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY)
     }
 
     private fun minmax(currentDepthVal: Int, node: Node, currentAgentIndex: Int, alphaVal: Float, betaVal: Float): Node {
@@ -32,8 +43,8 @@ class MinMaxPlayerAIStrategy(
         var beta = betaVal
         var currentDepth = currentDepthVal
 
-        if (currentDepth >= this.maxDepth || this.isTerminalState(player!!, node.position)) {
-            node.value = this.heuristic(player!!, node.position).toFloat()
+        if (currentDepth >= this.maxDepth || this.isTerminalState(player!!, node.levelState[player]!!)) {
+            node.value = this.heuristic(player!!, node.levelState[player]!!).toFloat()
             return node
         }
 
@@ -45,13 +56,12 @@ class MinMaxPlayerAIStrategy(
 
         var bestValue = if (currentAgentIndex == playerIndex) Float.NEGATIVE_INFINITY else Float.POSITIVE_INFINITY
         var bestNode: Node? = null
-        var bestMove: Pair<Int, Int>? = null
 
         for (move in getPossibleMoves(currentAgent)) {
-            // val newBoardState = applyMove(node.boardState, currentColor, move, alpha, beta);
-            val newNode = Node(Pair(
-                node.position.first + move.first,
-                node.position.second + move.second))
+            val newLevelState = cloneLevelState(node.levelState)
+            newLevelState[currentAgent]!!.addVector(move)
+
+            val newNode = Node(newLevelState)
 
             val nextAgentIndex =
                 if (currentAgent == player) 0 // player -> first enemy
@@ -62,21 +72,20 @@ class MinMaxPlayerAIStrategy(
                 else currentAgentIndex + 1 // non-last enemy -> next enemy
 
 
+            // TODO: check why this newEvalNode is not the same as simply newNode
             val newEvaluatedNode = this.minmax(currentDepth, newNode, nextAgentIndex, alpha, beta)
 
             // player == maximizer
             if (currentAgent == player && bestValue < newEvaluatedNode.value) {
-                bestValue = newEvaluatedNode.value
                 bestNode = newEvaluatedNode
-                bestMove = move
+                bestValue = newEvaluatedNode.value
                 alpha = alpha.coerceAtLeast(bestValue)
                 if (beta <= alpha) {
                     break
                 }
             } else if (currentAgent != player && bestValue > newEvaluatedNode.value) {
-                bestValue = newEvaluatedNode.value
                 bestNode = newEvaluatedNode
-                bestMove = move
+                bestValue = newEvaluatedNode.value
                 beta = beta.coerceAtMost(bestValue)
                 if (beta <= alpha) {
                     break
@@ -86,14 +95,20 @@ class MinMaxPlayerAIStrategy(
 
         }
 
-        if (bestNode === null) {
+        if (bestNode == null) {
             bestNode = node
-            bestValue = this.heuristic(player!!, node.position).toFloat() // heuristic should always evaluate it from the player's standpoint!! bc enemies wanna mimimize this value!
+            bestNode.value = this.heuristic(player!!, node.levelState[player]!!).toFloat() // heuristic should always evaluate it from the player's standpoint!! bc enemies wanna mimimize this value!
         }
 
-        bestNode.value = bestValue
-        bestNode.move = bestMove
         return bestNode
+    }
+
+    private fun cloneLevelState(map: Map<Entity, GameCoordinates>): Map<Entity, GameCoordinates> {
+        val new = mutableMapOf<Entity, GameCoordinates>()
+        map.forEach { (entity, xy) ->
+            new[entity] = xy.clone()
+        }
+        return new
     }
 
 }

@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IntervalIteratingSystem
 import com.badlogic.gdx.math.Vector2
 import ua.leonidius.coldline.entity.components.*
+import ua.leonidius.coldline.level.GameCoordinates
 import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.screens.game.GameScreen
 
@@ -19,33 +20,32 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
     private val typeMapper = ComponentMapper.getFor(TypeComponent::class.java)
     private val healthMapper = ComponentMapper.getFor(HealthComponent::class.java)
 
-    private val usedNodes = emptyList<Pair<Int, Int>>().toMutableList()
+    private val usedNodes = emptyList<GameCoordinates>().toMutableList()
 
     private val strategy = MinMaxPlayerAIStrategy(
-        { entity, pair -> isPositionTerminal(entity, pair.first, pair.second) },
-        { entity, pair -> evaluatePosition(entity, pair.first, pair.second) },
-        { entity -> getPossibleMoves(entity) }
+        ::isPositionTerminal,
+        ::evaluatePosition,
+        ::getPossibleMoves
     )
 
     override fun processEntity(player: Entity) {
         val nextMove = strategy.findNextMove(player,
             engine.getEntitiesFor(Family.all(EnemyComponent::class.java).get()).toList(),
-            positionMapper.get(player).tileXY)
+            positionMapper.get(player))
 
-        usedNodes.add(nextMove.position)
+        usedNodes.add(nextMove.levelState[player]!!)
 
-        movementMapper.get(player).velocity = Vector2(nextMove.move!!.first.toFloat(), nextMove.move!!.second.toFloat()).apply {
-            x *= 32
-            y *= 32
-        }
+        val move =  nextMove.levelState[player]!!.vectorSub(positionMapper.get(player))
+        movementMapper.get(player).velocity = move
+        // positionMapper.get(player).addVector(nextMove.move!!)
 
-        GameScreen.instance.move = nextMove.move!!
+        GameScreen.instance.move = move
     }
 
     // the closer to the door, the better
     // punishment for hitting an enemy, bonus for hitting a chest
-    private fun evaluatePosition(player: Entity, tileX: Int, tileY: Int): Double {
-        var score = 0.0
+    private fun evaluatePosition(player: Entity, xy: GameCoordinates): Double {
+        var score = 1000.0
 
         val door = engine.getEntitiesFor(Family.one(DoorComponent::class.java).get()).first()
         val doorPos = positionMapper.get(door)
@@ -62,13 +62,13 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
         if (distToDoor == 0F) score += 500
 
         // punishment for used nodes
-        val nodeWasUsed = usedNodes.filter { it.first == tileX && it.second == tileY }
+        val nodeWasUsed = usedNodes.filter { it.tileX == xy.tileX && it.tileY == xy.tileY }
         score -= nodeWasUsed.size * 50
         GameScreen.instance.reusing = nodeWasUsed.size
 
         for (entity in engine.entities) {
             val pos = positionMapper.get(entity)
-            if (pos.tileX == tileX && pos.tileY == tileY) {
+            if (pos.tileX == xy.tileX && pos.tileY == xy.tileY) {
                 val type = typeMapper.get(entity).type
                 if (type == EntityType.CHEST) score += 100
                 else if (type == EntityType.ENEMY_DUMB
@@ -80,10 +80,10 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
         return score
     }
 
-    private fun isPositionTerminal(player: Entity, tileX: Int, tileY: Int): Boolean {
+    private fun isPositionTerminal(player: Entity, xy: GameCoordinates): Boolean {
         for (entity in engine.entities) {
             val pos = positionMapper.get(entity)
-            if (pos.tileX == tileX && pos.tileY == tileY) {
+            if (pos.tileX == xy.tileX && pos.tileY == xy.tileY) {
                 val type = typeMapper.get(entity).type
                 if (type == EntityType.DOOR) return true
                 else if (type == EntityType.ENEMY_DUMB
@@ -99,7 +99,7 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
 
     // account for walls
     private fun getPossibleMoves(entity: Entity): MutableList<Pair<Int, Int>> {
-        val playerPos = positionMapper.get(entity)
+        val position = positionMapper.get(entity)
 
         val moves = mutableListOf(
             Pair(0, 1), Pair(0, -1), Pair(1, 0), Pair(-1, 0),
@@ -107,8 +107,9 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
         )
 
         moves.retainAll {
-            !level.isTileWithCollisionAt(playerPos.tileX + it.first,
-                playerPos.tileY + it.second)
+            !level.isTileWithCollisionAt(
+                GameCoordinates.fromTile( position.tileX + it.first,
+                position.tileY + it.second))
         }
 
         return moves

@@ -36,12 +36,14 @@ class RenderingSystem(
                 if (engine.entities.contains(entity)) { // WARNING: O(N)
                     val textureComponent = textureMapper.get(entity)
                     val positionComponent = positionMapper.get(entity)
-                    batch.draw(textureComponent.texture, positionComponent.mapX, positionComponent.mapY)
+                    batch.draw(textureComponent.texture,
+                        positionComponent.tileX * 16F,
+                        positionComponent.tileY * 16F)
 
                     if (typeMapper.get(entity).type == EntityType.PLAYER) {
                         camera.position.apply {
-                            x = positionComponent.mapX
-                            y = positionComponent.mapY
+                            x = positionComponent.tileX * 16F
+                            y = positionComponent.tileY * 16F
                         }
                     }
                 }

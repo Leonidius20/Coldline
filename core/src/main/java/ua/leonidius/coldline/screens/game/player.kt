@@ -4,12 +4,13 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Texture
 import ua.leonidius.coldline.entity.components.*
 
+@Deprecated("use tile coordinates")
 fun GameScreen.createPlayer(playerMapX: Float, playerMapY: Float): Entity {
     with(engine) {
         createEntity().run {
             add(createComponent(PositionComponent::class.java).apply {
-                mapX = playerMapX
-                mapY = playerMapY
+                tileX = (playerMapX / 16).toInt()
+                tileY = (playerMapY / 16).toInt()
             })
 
             add(createComponent(TextureComponent::class.java).apply {

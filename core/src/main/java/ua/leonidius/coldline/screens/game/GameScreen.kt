@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
+import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
 import ua.leonidius.coldline.controller.KeyboardController
 import ua.leonidius.coldline.entity.components.HealthComponent
@@ -20,6 +21,10 @@ import ua.leonidius.coldline.entity.systems.player_ai.PlayerAISystem
 import ua.leonidius.coldline.level.generation.LevelGenerator
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
 import ua.leonidius.coldline.renderer.PathRenderer
+import java.math.BigInteger
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption
 
 
 class GameScreen(private val game: Main) : Screen {
@@ -61,6 +66,9 @@ class GameScreen(private val game: Main) : Screen {
     var move: Pair<Int, Int> = Pair(0, 0)
     var reusing = 0
 
+    val playerAiAlgo = "minmax"
+    var timeBefore = BigInteger.ZERO
+
     val engine = PooledEngine().apply {
         addSystem(RenderingSystem(renderer.batch, camera))
         addSystem(PlayerControlSystem(keyboardController))
@@ -72,7 +80,7 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(DeathSystem())
         addSystem(EnemyHarmSystem())
         addSystem(ChestCollectionSystem())
-        addSystem(PlayerAISystem(level))
+        addSystem(PlayerAISystem(level, playerAiAlgo))
     }
 
     private lateinit var playerPosition: PositionComponent
@@ -98,6 +106,8 @@ class GameScreen(private val game: Main) : Screen {
         engine.addSystem(EnemyCombatSystem(playerPosition, level))
 
         addEnemies()
+
+        timeBefore = TimeUtils.millis().toBigInteger()
     }
 
     private fun addChestEntities() {
@@ -110,14 +120,14 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     private fun addEnemies() {
-        repeat(1) {
+        repeat(2) {
             val x = MathUtils.random(1, levelGenerator.width - 1)
             val y = MathUtils.random(1, levelGenerator.height - 1)
             if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
                 createEnemy(x, y, true) // dumb enemies
             }
         }
-        repeat(1) {
+        repeat(2) {
             val x = MathUtils.random(1, levelGenerator.width - 1)
             val y = MathUtils.random(1, levelGenerator.height - 1)
             if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
@@ -240,6 +250,14 @@ class GameScreen(private val game: Main) : Screen {
 
     fun gameOver() {
         val score = if (playerHealth.health <= 0) 0 else  1000 / playerScore.distanceTraversed + playerScore.chestsCollected * 20 + playerHealth.health
+        val timeAfter = TimeUtils.millis().toBigInteger()
+        val isWin = if (playerHealth.health <= 0) false else true
+        val timeElapsed = timeAfter.subtract(timeBefore).divide(1000F.toLong().toBigInteger() )
+        Files.writeString(
+            Path.of("stats.csv"),
+            "${playerAiAlgo},${isWin},${score},${timeElapsed}" + System.lineSeparator(),
+            StandardOpenOption.CREATE, StandardOpenOption.APPEND
+        )
         game.toMenuScreen(score.toInt())
     }
 

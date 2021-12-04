@@ -15,8 +15,8 @@ import ua.leonidius.coldline.level.Level
 
 class LevelGenerator(tileSet: TiledMapTileSet) {
 
-    val width = 50
-    val height = 50
+    val width = 26
+    val height = 26
 
     private val tileWidth = 16
     private val tileHeight = 16
@@ -57,11 +57,11 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         val grid = Grid(width / 2, height / 2)
 
         DungeonGenerator().apply {
-            roomGenerationAttempts = 10
-            maxRoomSize = 15 / 2
-            tolerance = 6 / 2
-            minRoomSize = 5 / 2 + 1
-            randomConnectorChance = 0.4F
+            roomGenerationAttempts = 5
+            maxRoomSize = 5
+            tolerance = 6 / 4
+            minRoomSize = 3
+            randomConnectorChance = 0.2F
         }.generate(grid)
 
         val map = TiledMap()

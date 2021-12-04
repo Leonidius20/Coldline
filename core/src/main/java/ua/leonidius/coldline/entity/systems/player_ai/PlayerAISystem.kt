@@ -10,7 +10,7 @@ import ua.leonidius.coldline.level.GameCoordinates
 import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.screens.game.GameScreen
 
-class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
+class PlayerAISystem(private val level: Level, playerAiAlgo: String) : IntervalIteratingSystem(
     Family.all(PlayerComponent::class.java).get(), 0.25F
 ) {
 
@@ -22,22 +22,29 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
 
     private val usedNodes = emptyList<GameCoordinates>().toMutableList()
 
-    private val strategy = MinMaxPlayerAIStrategy(
+    private val strategy = if (playerAiAlgo == "minmax") MinMaxPlayerAIStrategy(
+        ::isPositionTerminal,
+        ::evaluatePosition,
+        ::getPossibleMoves
+    ) else ExpectiMaxPlayerAIStrategy(
         ::isPositionTerminal,
         ::evaluatePosition,
         ::getPossibleMoves
     )
 
+    private lateinit var enemies: List<Entity>
+
     override fun processEntity(player: Entity) {
+        enemies = engine.getEntitiesFor(Family.all(EnemyComponent::class.java).get()).toList()
+
         val nextMove = strategy.findNextMove(player,
-            engine.getEntitiesFor(Family.all(EnemyComponent::class.java).get()).toList(),
-            positionMapper.get(player))
+           enemies,
+           positionMapper.get(player))
 
         usedNodes.add(nextMove.levelState[player]!!)
 
-        val move =  nextMove.levelState[player]!!.vectorSub(positionMapper.get(player))
+        val move = nextMove.levelState[player]!!.vectorSub(positionMapper.get(player))
         movementMapper.get(player).velocity = move
-        // positionMapper.get(player).addVector(nextMove.move!!)
 
         GameScreen.instance.move = move
     }
@@ -60,6 +67,17 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
         score -= distToDoor
 
         if (distToDoor == 0F) score += 500
+
+        // punishment for being close to enemies
+        for (enemy in enemies) {
+            val enemyPos = positionMapper.get(enemy)
+
+            score -= Vector2.dst(
+                enemyPos.tileX.toFloat(), enemyPos.tileY.toFloat(),
+                playerPos.tileX.toFloat(), playerPos.tileY.toFloat()
+            ) / 10
+        }
+
 
         // punishment for used nodes
         val nodeWasUsed = usedNodes.filter { it.tileX == xy.tileX && it.tileY == xy.tileY }
@@ -86,11 +104,11 @@ class PlayerAISystem(private val level: Level) : IntervalIteratingSystem(
             if (pos.tileX == xy.tileX && pos.tileY == xy.tileY) {
                 val type = typeMapper.get(entity).type
                 if (type == EntityType.DOOR) return true
-                else if (type == EntityType.ENEMY_DUMB
+                /*else if (type == EntityType.ENEMY_DUMB
                     || type == EntityType.ENEMY_SMART
                 ) {
                     if (healthMapper.get(player).health <= 20) return true
-                }
+                }*/
             }
         }
 

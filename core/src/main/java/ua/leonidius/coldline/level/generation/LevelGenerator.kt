@@ -15,8 +15,8 @@ import ua.leonidius.coldline.level.Level
 
 class LevelGenerator(tileSet: TiledMapTileSet) {
 
-    val width = 26
-    val height = 26
+    val width = 50
+    val height = 50
 
     private val tileWidth = 16
     private val tileHeight = 16
@@ -49,7 +49,8 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
     fun load(tmxFile: String): Level {
         val builder = Level.Builder()
         loadMap(tmxFile, builder)
-        generateGraphs(builder)
+
+        // generateGraphs(builder)
         return builder.get()
     }
 
@@ -57,11 +58,11 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
         val grid = Grid(width / 2, height / 2)
 
         DungeonGenerator().apply {
-            roomGenerationAttempts = 5
-            maxRoomSize = 5
-            tolerance = 6 / 4
-            minRoomSize = 3
-            randomConnectorChance = 0.2F
+            roomGenerationAttempts = 10
+            maxRoomSize = 15 / 2
+            tolerance = 6 / 2
+            minRoomSize = 5 / 2 + 1
+            randomConnectorChance = 0.4F
         }.generate(grid)
 
         val map = TiledMap()
@@ -230,7 +231,11 @@ class LevelGenerator(tileSet: TiledMapTileSet) {
 
     private fun loadMap(tmxFile: String, builder: Level.Builder) {
         val map = TmxMapLoader().load(tmxFile)
-        val objectLayer = map.layers["objects"]
+        objectLayer = map.layers["objects"]
+
+
+
+        collisionLayer = map.layers["collision"] as TiledMapTileLayer
         val door = objectLayer.objects.find { it.name == "door" } as TiledMapTileMapObject
 
         builder.setMap(map)

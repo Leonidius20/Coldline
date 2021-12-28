@@ -22,14 +22,30 @@ class PlayerControlSystem(
         val movementComponent = movementMapper.get(entity)
         with(movementComponent) {
             val velocityY =
-                if (keyboardController.up) speed
-                else if (keyboardController.down) -speed
+                if (keyboardController.up && !madeStepY) {
+                    madeStepY = true
+                    1
+                }
+                else if (keyboardController.down && !madeStepY) {
+                    madeStepY = true
+                    -1
+                }
                 else 0
 
             val velocityX =
-                if (keyboardController.right) speed
-                else if (keyboardController.left) -speed
+                if (keyboardController.right && !madeStepX) {
+                    madeStepX = true
+                    1
+                }
+                else if (keyboardController.left && !madeStepX) {
+                    madeStepX = true
+                    -1
+
+                }
                 else 0
+
+            if (!keyboardController.down && !keyboardController.up) madeStepY = false
+            if (!keyboardController.right && !keyboardController.left) madeStepX = false
 
             velocity = Pair(velocityX, velocityY)
         }

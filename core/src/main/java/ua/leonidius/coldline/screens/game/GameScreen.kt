@@ -5,10 +5,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.ScreenUtils
 import com.badlogic.gdx.utils.TimeUtils
 import ua.leonidius.coldline.Main
@@ -17,14 +15,10 @@ import ua.leonidius.coldline.entity.components.HealthComponent
 import ua.leonidius.coldline.entity.components.PositionComponent
 import ua.leonidius.coldline.entity.components.ScoreComponent
 import ua.leonidius.coldline.entity.systems.*
-import ua.leonidius.coldline.entity.systems.player_ai.PlayerAISystem
-import ua.leonidius.coldline.level.generation.LevelGenerator
+import ua.leonidius.coldline.level.GameCoordinates
+import ua.leonidius.coldline.level.Level
 import ua.leonidius.coldline.renderer.MapWithObjectsRenderer
-import ua.leonidius.coldline.renderer.PathRenderer
 import java.math.BigInteger
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.StandardOpenOption
 
 
 class GameScreen(private val game: Main) : Screen {
@@ -49,17 +43,30 @@ class GameScreen(private val game: Main) : Screen {
     // TODO: private val assetManager = AssetManager()
 
     // TODO: create tile set loader
-    private val tileSet = TmxMapLoader().load("maps/level2.tmx").tileSets.getTileSet(0)
-    private val levelGenerator = LevelGenerator(tileSet)
-    val level = levelGenerator.generate()
+    val map = TmxMapLoader().load("maps/level2.tmx")
+    private val tileSet = map.tileSets.getTileSet(0)
+
+    // private val levelGenerator = LevelGenerator(tileSet)
+    // val level = levelGenerator.generate()
+    // val level = levelGenerator.load("maps/level2.tmx")
+
+    private var exitTileX = 45
+    private var exitTileY = 50 - 4
+
+    val level = Level.Builder().apply {
+        setMap(map)
+        setDoorCoordinates(GameCoordinates.fromTile(exitTileX, exitTileY))
+    }.get()
+
+
+
     private val renderer = MapWithObjectsRenderer(level, 1F)
 
     private val keyboardController = KeyboardController(this)
 
-    private var exitTileX = levelGenerator.doorTileX
-    private var exitTileY = levelGenerator.doorTileY
 
-    val pathRenderer = PathRenderer(camera, level)
+
+    // val pathRenderer = PathRenderer(camera, level)
     var lastPathAlgorithm: String? = null
     var lastPathComputeTime = -1.0
 
@@ -76,11 +83,11 @@ class GameScreen(private val game: Main) : Screen {
         addSystem(WallCollisionSystem(level))
         addSystem(EntityCollisionSystem())
         addSystem(DoorSystem(::gameOver))
-        addSystem(PathHighlightingSystem(pathRenderer))
+        // addSystem(PathHighlightingSystem(pathRenderer))
         addSystem(DeathSystem())
         addSystem(EnemyHarmSystem())
         addSystem(ChestCollectionSystem())
-        addSystem(PlayerAISystem(level, playerAiAlgo))
+        // addSystem(PlayerAISystem(level, playerAiAlgo))
     }
 
     private lateinit var playerPosition: PositionComponent
@@ -90,12 +97,12 @@ class GameScreen(private val game: Main) : Screen {
     override fun show() {
         Gdx.input.inputProcessor = keyboardController
 
-        with (level.objectLayer.objects.get("spawnPoint") as RectangleMapObject) {
-            val player = createPlayer(rectangle.x, rectangle.y)
+        ///with (level.objectLayer.objects.get("spawnPoint") as RectangleMapObject) {
+            val player = createPlayer(42 * 16F,  (50 - 42) * 16F)
             playerPosition = player.getComponent(PositionComponent::class.java)
             playerHealth = player.getComponent(HealthComponent::class.java)
             playerScore = player.getComponent(ScoreComponent::class.java)
-        }
+        //}
 
         // TODO: similar to addCHestEntities()
         createDoor(exitTileX, exitTileY)
@@ -120,20 +127,9 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     private fun addEnemies() {
-        repeat(2) {
-            val x = MathUtils.random(1, levelGenerator.width - 1)
-            val y = MathUtils.random(1, levelGenerator.height - 1)
-            if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
-                createEnemy(x, y, true) // dumb enemies
-            }
-        }
-        repeat(2) {
-            val x = MathUtils.random(1, levelGenerator.width - 1)
-            val y = MathUtils.random(1, levelGenerator.height - 1)
-            if (level.collisionLayer.getCell(x, y).tile == levelGenerator.floorTile) {
-                createEnemy(x, y, false) // smart enemies
-            }
-        }
+        createEnemy(20, 34, true)
+        createEnemy(44, 18, true)
+        createEnemy(6, 29, true)
     }
 
     override fun render(delta: Float) {
@@ -153,7 +149,7 @@ class GameScreen(private val game: Main) : Screen {
         }
 
         // rendering path
-        pathRenderer.render()
+        // pathRenderer.render()
 
         engine.update(delta)
     }
@@ -180,13 +176,13 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     fun switchPathAlgo() {
-        val data = pathRenderer.switchPathAlgorithm()
+        /*val data = pathRenderer.switchPathAlgorithm()
         lastPathAlgorithm = data.first
-        lastPathComputeTime = data.second
+        lastPathComputeTime = data.second*/
     }
 
     fun switchPathHighlightingMode() {
-        pathRenderer.displayWholePath = !pathRenderer.displayWholePath
+        // pathRenderer.displayWholePath = !pathRenderer.displayWholePath
     }
 
     private fun mapToTileCoordinate(coordinate: Float) =
@@ -203,7 +199,7 @@ class GameScreen(private val game: Main) : Screen {
     }
 
     private fun printPathComputeTime(batch: Batch) {
-        pathRenderer.let {
+        /*pathRenderer.let {
             if (lastPathAlgorithm != null) {
                 game.bitmapFont.draw(
                     batch,
@@ -211,7 +207,7 @@ class GameScreen(private val game: Main) : Screen {
                     0F, 80F
                 )
             }
-        }
+        }*/
     }
 
     private fun printDoorLocation(batch: Batch) {
@@ -253,12 +249,17 @@ class GameScreen(private val game: Main) : Screen {
         val timeAfter = TimeUtils.millis().toBigInteger()
         val isWin = if (playerHealth.health <= 0) false else true
         val timeElapsed = timeAfter.subtract(timeBefore).divide(1000F.toLong().toBigInteger() )
-        Files.writeString(
-            Path.of("stats.csv"),
-            "${playerAiAlgo},${isWin},${score},${timeElapsed}" + System.lineSeparator(),
-            StandardOpenOption.CREATE, StandardOpenOption.APPEND
-        )
+        //Files.writeString(
+        //    Path.of("stats.csv"),
+        //    "${playerAiAlgo},${isWin},${score},${timeElapsed}" + System.lineSeparator(),
+        //    StandardOpenOption.CREATE, StandardOpenOption.APPEND
+        //)
         game.toMenuScreen(score.toInt())
+    }
+
+    fun saveLevel() {
+        //val file = Gdx.files.local("level.dat")
+        //file.writeString(Json().toJson(level.map), false)
     }
 
 }

@@ -28,3 +28,6 @@ expectimax,true,167.87402,41
 expectimax,false,0,33
 expectimax,true,130.75269,30
 expectimax,true,124.03226,79
+
+# gg
+minmax,false,0,3

@@ -4,5 +4,7 @@ import com.badlogic.ashley.core.Component
 
 data class MovementComponent(
     var velocity: Pair<Int, Int> = Pair(0, 0),
-    var speed: Int = 1
+    var speed: Int = 1,
+    var madeStepX: Boolean = false,
+    var madeStepY: Boolean = false,
 ): Component

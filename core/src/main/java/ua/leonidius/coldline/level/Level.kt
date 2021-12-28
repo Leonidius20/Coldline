@@ -38,7 +38,10 @@ class Level {
     fun isTileWithCollisionAt(xy: GameCoordinates) =
         collisionLayer.run {
             val cell = getCell(xy.tileX, xy.tileY)
-            cell!!.tile!!.properties!!.containsKey("blocked") ?: false
+            cell!!
+                .tile!!
+                .properties!!.
+                containsKey("blocked") ?: false
         }
 
     class Builder {
